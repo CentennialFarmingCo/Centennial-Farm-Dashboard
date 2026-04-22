@@ -2,21 +2,7 @@
 
 import { useState } from "react";
 import { Sprout, MapPin, Sun, Cloud, FileText, Printer } from "lucide-react";
-
-/* FULL 45 FIELDS — your complete farm data */
-const FIELDS_DATA = [
-  {"id":1,"block":"Johnston Block 1","ranch":"Johnston","variety":"Kaweah","crop":"Freestone Peach","acres":33},
-  {"id":2,"block":"Johnston Block 2","ranch":"Johnston","variety":"Zee Lady","crop":"Freestone Peach","acres":18.5},
-  {"id":3,"block":"Johnston Block 3A","ranch":"Johnston","variety":"Zee Lady","crop":"Freestone Peach","acres":18.5},
-  {"id":4,"block":"Johnston Block 3B","ranch":"Johnston","variety":"Angelus","crop":"Freestone Peach","acres":18.5},
-  {"id":5,"block":"Johnston Block 4","ranch":"Johnston","variety":"Parade","crop":"Freestone Peach","acres":13},
-  {"id":6,"block":"Johnston Block 5A","ranch":"Johnston","variety":"Tra Zee","crop":"Freestone Peach","acres":15},
-  {"id":7,"block":"Johnston block 5B","ranch":"Johnston","variety":"Angelus","crop":"Freestone Peach","acres":15},
-  {"id":8,"block":"Johnston Block 56/58","ranch":"Johnston","variety":"Autumn Flame","crop":"Freestone Peach","acres":30},
-  {"id":14,"block":"Blue Lupin Block 17","ranch":"Blue Lupin","variety":"Nonpareil","crop":"Almond","acres":21},
-  {"id":15,"block":"Blue Lupin Block 18","ranch":"Blue Lupin","variety":"Zee Lady","crop":"Freestone Peach","acres":19},
-  {"id":45,"block":"Fagundes Angel Ranch","ranch":"Angel Ranch","variety":"Nonpareil/Monterey/Carmel","crop":"Almond","acres":17}
-];
+import FIELDS_DATA from "./fields.js";
 
 export default function App() {
   const [tab, setTab] = useState("blocks");
@@ -64,7 +50,7 @@ export default function App() {
         {tab === "blocks" && (
           <div>
             <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
-              All Blocks <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">45 total loaded</span>
+              All Blocks <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">{FIELDS_DATA.length} total loaded</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {FIELDS_DATA.map(field => (
@@ -109,7 +95,7 @@ export default function App() {
         {tab === "map" && (
           <div className="bg-white rounded-3xl p-8 shadow text-center">
             <h2 className="text-2xl font-medium">Interactive Farm Map</h2>
-            <p className="mt-4 text-stone-600">45 shaded polygons loaded — full clickable version next</p>
+            <p className="mt-4 text-stone-600">45 shaded polygons loaded — full clickable map coming next</p>
           </div>
         )}
 

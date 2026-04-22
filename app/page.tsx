@@ -9,10 +9,7 @@ import {
   ArrowUpRight, Zap, Download
 } from "lucide-react";
 
-/* ═══════════════════════════════════════════════════════════════════════
-FIELD DATA — parsed from user’s KML (Merced County, CA)
-═══════════════════════════════════════════════════════════════════════ */
-
+/* FIELDS_DATA */
 const FIELDS_DATA = [
   {"id":1,"block":"Johnston Block 1","ranch":"Johnston","variety":"Kaweah","crop":"Freestone Peach","acres":33.0,"center":[-120.775215,37.40931],"polygon":[[-120.777364,37.410404],[-120.777459,37.407256],[-120.773089,37.407224],[-120.772961,37.410206],[-120.773051,37.410366],[-120.777364,37.410404]]},
   {"id":2,"block":"Johnston Block 2","ranch":"Johnston","variety":"Zee Lady","crop":"Freestone Peach","acres":18.5,"center":[-120.775338,37.405775],"polygon":[[-120.77746,37.407164],[-120.777516,37.405189],[-120.777171,37.405128],[-120.775596,37.405097],[-120.77514,37.405084],[-120.774115,37.405052],[-120.774088,37.4054],[-120.773958,37.405536],[-120.773126,37.405554],[-120.773083,37.407152],[-120.77746,37.407164]]},
@@ -60,10 +57,9 @@ const FIELDS_DATA = [
   {"id":44,"block":"Fagundes Mello","ranch":"Mello","variety":"Independence","crop":"Almond","acres":35.0,"center":[-120.585586,37.470855],"polygon":[[-120.59255,37.475593],[-120.592589,37.475364],[-120.592947,37.475346],[-120.593164,37.475443],[-120.593301,37.475515],[-120.593366,37.475503],[-120.5934,37.47544],[-120.593373,37.47536],[-120.59328,37.475263],[-120.593144,37.475158],[-120.592993,37.475075],[-120.592761,37.474978],[-120.592512,37.474825],[-120.592286,37.474647],[-120.592,37.474441],[-120.591664,37.474192],[-120.59131,37.473913],[-120.591017,37.473671],[-120.590759,37.473432],[-120.590484,37.473178],[-120.590255,37.472935],[-120.590037,37.472696],[-120.58985,37.472463],[-120.589663,37.472218],[-120.589415,37.471892],[-120.58915,37.471535],[-120.588843,37.47109],[-120.588583,37.470676],[-120.588285,37.47028],[-120.587832,37.469681],[-120.587559,37.469294],[-120.587273,37.46893],[-120.586972,37.468505],[-120.586655,37.468084],[-120.586442,37.467776],[-120.586187,37.467428],[-120.585768,37.466944],[-120.585336,37.466486],[-120.585004,37.466144],[-120.584766,37.465909],[-120.584564,37.46572],[-120.584369,37.465557],[-120.58419,37.465422],[-120.584089,37.465359],[-120.583843,37.465228],[-120.583541,37.465086],[-120.583198,37.46495],[-120.582757,37.464783],[-120.58245,37.46469],[-120.582249,37.464655],[-120.58202,37.464628],[-120.581799,37.464613],[-120.581523,37.464608],[-120.581133,37.464607],[-120.580781,37.464619],[-120.580533,37.464613],[-120.580271,37.464597],[-120.580075,37.464573],[-120.579863,37.464536],[-120.579535,37.464463],[-120.579201,37.464395],[-120.57891,37.464327],[-120.578596,37.464241],[-120.578254,37.464117],[-120.577965,37.463987],[-120.577664,37.463837],[-120.577379,37.463689],[-120.577068,37.463519],[-120.576777,37.463359],[-120.576374,37.463141],[-120.577069,37.463524]]},
   {"id":45,"block":"Fagundes Angel Ranch","ranch":"Angel Ranch","variety":"Nonpareil/Monterey/Carmel","crop":"Almond","acres":17.0,"center":[-120.583343,37.401219],"polygon":[[-120.585727,37.402165],[-120.585678,37.400485],[-120.584487,37.400369],[-120.581159,37.400373],[-120.581158,37.400373],[-120.581156,37.400374],[-120.58116,37.402169],[-120.585727,37.402165]]}
 ];
-];
 
+/* VARIETY_DB */
 const VARIETY_DB = {
-  // FREESTONE PEACHES
   "Parade":       { bloom:"Feb 25", harvest:"Jul 15–25",  season:"early",       pitHard:"May 15",  notes:"Early freestone. Vigorous; thin aggressively. Susceptible to split-pit if over-thinned early." },
   "July Flame":   { bloom:"Feb 28", harvest:"Jul 25–Aug 5", season:"mid",       pitHard:"May 20",  notes:"Mid-season freestone. Moderate vigor; excellent red coloring. Good for freezer pack." },
   "Tra Zee":      { bloom:"Mar 1",  harvest:"Aug 15–25", season:"mid-late",    pitHard:"May 25",  notes:"Mid-late freestone. Firm flesh; holds well." },
@@ -75,28 +71,31 @@ const VARIETY_DB = {
   "Carnival":     { bloom:"Mar 10", harvest:"Sep 20–Oct 5", season:"very late", pitHard:"Jun 15",  notes:"Very late, Autumn Red type. Firmness excellent; late N can push size but risks delayed shutdown." },
   "Fay Elberta":  { bloom:"Feb 28", harvest:"Jul 25–Aug 10", season:"mid",     pitHard:"May 22",  notes:"Classic cannery/freezer freestone. Heat-sensitive; monitor for sunburn on west exposures." },
   "Elegant Lady": { bloom:"Mar 2",  harvest:"Aug 5–20", season:"mid-late",    pitHard:"May 28",  notes:"Firm flesh; cannery-adaptable freestone. Holds well for shipment." },
-
-  // CLING PEACHES
   "Late Ross":    { bloom:"Mar 3",  harvest:"Sep 5–20", season:"very late cling", pitHard:"Jun 5",  notes:"Premium late cannery cling. Very firm; target 2.5\"+. Extended thinning window due to late pit hardening.", cannery:true },
   "Klamath":      { bloom:"Feb 28", harvest:"Aug 1–15", season:"mid cling",     pitHard:"May 25",  notes:"Mid-season cling. Thin to 6\" spacing single fruit for can grade. Heat tolerant.", cannery:true },
-
-  // ALMONDS
   "Nonpareil":    { bloom:"Feb 20", harvest:"Aug 10–25", season:"standard",    hullSplit:"Jul 10", notes:"Industry standard; NOW host #1. Hull split spray window critical late-July." },
   "Butte/Padre":  { bloom:"Feb 25", harvest:"Sep 5–20",  season:"hardshell",   hullSplit:"Aug 1",  notes:"Hardshell pair; reduced NOW pressure. Later harvest window extends drying risk late-season." },
   "Independence": { bloom:"Feb 18", harvest:"Aug 15–30", season:"self-fertile", hullSplit:"Jul 15", notes:"Self-fertile; simpler pollination. Hull rot sensitive — modulate late irrigation carefully." },
   "Nonpareil/Monterey": { bloom:"Feb 20", harvest:"Aug 10–Sep 15", season:"mixed", hullSplit:"Jul 12", notes:"Monterey harvests 3–4 weeks after Nonpareil. Separate shake passes required." },
   "Nonpareil/Monterey/Carmel": { bloom:"Feb 20", harvest:"Aug 10–Sep 15", season:"mixed", hullSplit:"Jul 12", notes:"3-way pollinizer planting. Plan 2–3 shake passes; Carmel tightest to NP on harvest." }
 };
-};
 
-const RANCH_COLORS = { /* your ranch colors */ };
-const CROP_COLORS = { /* your crop colors */ };
-
-// Paste the rest of your functions: parseBloomDate, parseHarvestWindow, daysBetween,
-// computePhenology, generateTasks, estimateSeasonDD, FieldMap, TaskIcon, BlockCard,
-// TodayView, StatCard, BlocksView, MapView, WeatherView, Field, DocumentsView,
-// summarizeDoc, ReportView, SetupView, Step, Bullet, and finally your full App() component.
-
+/* Minimal working App for testing */
 export default function App() {
-  // Your full App component here (tabs, header, main content, etc.)
+  const [tab, setTab] = useState("today");
+
+  return (
+    <div className="min-h-screen bg-[#F4EEE0] p-8">
+      <h1 className="text-4xl font-serif text-stone-900">Centennial Farming Dashboard</h1>
+      <p className="text-stone-600 mt-2">Build successful! 🎉</p>
+      <p className="mt-8 text-sm text-stone-500">Total fields loaded: {FIELDS_DATA.length}</p>
+      <p className="text-sm text-stone-500">Varieties loaded: {Object.keys(VARIETY_DB).length}</p>
+      <button 
+        onClick={() => alert("Dashboard is working!")}
+        className="mt-8 bg-[#C55A2E] text-white px-6 py-3 rounded font-medium"
+      >
+        Test Button
+      </button>
+    </div>
+  );
 }

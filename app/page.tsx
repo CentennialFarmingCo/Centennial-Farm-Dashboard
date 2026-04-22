@@ -14,7 +14,6 @@ FIELD DATA — parsed from user’s KML (Merced County, CA)
 ═══════════════════════════════════════════════════════════════════════ */
 
 const FIELDS_DATA = [
-const FIELDS_DATA = [
   {"id":1,"block":"Johnston Block 1","ranch":"Johnston","variety":"Kaweah","crop":"Freestone Peach","acres":33.0,"center":[-120.775215,37.40931],"polygon":[[-120.777364,37.410404],[-120.777459,37.407256],[-120.773089,37.407224],[-120.772961,37.410206],[-120.773051,37.410366],[-120.777364,37.410404]]},
   {"id":2,"block":"Johnston Block 2","ranch":"Johnston","variety":"Zee Lady","crop":"Freestone Peach","acres":18.5,"center":[-120.775338,37.405775],"polygon":[[-120.77746,37.407164],[-120.777516,37.405189],[-120.777171,37.405128],[-120.775596,37.405097],[-120.77514,37.405084],[-120.774115,37.405052],[-120.774088,37.4054],[-120.773958,37.405536],[-120.773126,37.405554],[-120.773083,37.407152],[-120.77746,37.407164]]},
   {"id":3,"block":"Johnston Block 3A","ranch":"Johnston","variety":"Zee Lady","crop":"Freestone Peach","acres":18.5,"center":[-120.771895,37.406831],"polygon":[[-120.770752,37.408501],[-120.77299,37.408521],[-120.773069,37.405142],[-120.772889,37.405096],[-120.771168,37.405101],[-120.770688,37.405094],[-120.770752,37.408501]]},
@@ -63,7 +62,6 @@ const FIELDS_DATA = [
 ];
 ];
 
-const VARIETY_DB = {
 const VARIETY_DB = {
   // FREESTONE PEACHES
   "Parade":       { bloom:"Feb 25", harvest:"Jul 15–25",  season:"early",       pitHard:"May 15",  notes:"Early freestone. Vigorous; thin aggressively. Susceptible to split-pit if over-thinned early." },

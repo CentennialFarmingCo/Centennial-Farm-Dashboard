@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { Sprout, MapPin, Sun, Cloud, FileText, Printer } from "lucide-react";
+import { Sprout, MapPin, Sun, Cloud, FileText, Printer, CheckCircle2, Leaf, Droplet, Bug, Wind, Thermometer } from "lucide-react";
 import FIELDS_DATA from "./fields.js";
 
 export default function App() {
@@ -109,17 +109,17 @@ export default function App() {
         )}
 
         {tab === "map" && (
-          <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: '600' }}>Interactive Farm Map</h2>
-            <p style={{ marginTop: '24px', color: '#555' }}>45 shaded polygons loaded from your KML</p>
-            <p style={{ marginTop: '8px', color: '#888' }}>Full clickable version with zoom coming next upgrade</p>
+          <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '40px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>Interactive Farm Map</h2>
+            <p style={{ color: '#555', marginBottom: '8px' }}>45 shaded polygons from your KML</p>
+            <p style={{ color: '#888' }}>Full clickable version with zoom and popups coming in the next upgrade</p>
           </div>
         )}
 
         {tab === "weather" && (
-          <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: '600' }}>Weather & Irrigation Alerts</h2>
-            <p style={{ marginTop: '24px', color: '#555' }}>Real-time conditions + RDI recommendations coming next</p>
+          <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '40px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>Weather & Irrigation Alerts</h2>
+            <p style={{ color: '#555' }}>Real-time conditions + RDI windows coming in the next upgrade</p>
           </div>
         )}
 
@@ -130,9 +130,9 @@ export default function App() {
               style={{ backgroundColor: '#C55A2E', color: 'white', padding: '16px 40px', borderRadius: '9999px', fontSize: '18px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '12px', boxShadow: '0 10px 15px -3px rgba(197,90,46,0.4)' }}
             >
               <Printer style={{ width: '28px', height: '28px' }} />
-              Generate Full PDF Report
+              Generate Full Season PDF Report
             </button>
-            <p style={{ marginTop: '16px', color: '#666' }}>One-click printable report with all blocks, phenology & tasks</p>
+            <p style={{ marginTop: '24px', color: '#666' }}>One-click printable report with all blocks, phenology & tasks</p>
           </div>
         )}
       </main>

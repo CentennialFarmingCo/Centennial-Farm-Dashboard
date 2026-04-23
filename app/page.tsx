@@ -17,7 +17,7 @@ export default function App() {
 
   return (
     <div style={{ backgroundColor: '#F4EEE0', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
-      {/* HEADER - forced peach color */}
+      {/* HEADER */}
       <header style={{ backgroundColor: '#C55A2E', color: 'white', padding: '24px', position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
           <Sprout style={{ width: '48px', height: '48px' }} />
@@ -89,16 +89,20 @@ export default function App() {
         )}
 
         {tab === "today" && (
-          <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>Today’s Snapshot</h2>
+          <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>Today’s Snapshot</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-              <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px' }}>
+              <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
                 <p style={{ color: '#555' }}>Pit Hardening</p>
                 <p style={{ fontSize: '36px', fontWeight: '700', color: '#C55A2E' }}>42 days</p>
               </div>
-              <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px' }}>
+              <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
                 <p style={{ color: '#555' }}>High Priority Tasks</p>
                 <p style={{ fontSize: '36px', fontWeight: '700', color: '#f97316' }}>7</p>
+              </div>
+              <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
+                <p style={{ color: '#555' }}>Acres in Focus</p>
+                <p style={{ fontSize: '36px', fontWeight: '700', color: '#4ade80' }}>185</p>
               </div>
             </div>
           </div>
@@ -107,14 +111,15 @@ export default function App() {
         {tab === "map" && (
           <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
             <h2 style={{ fontSize: '24px', fontWeight: '600' }}>Interactive Farm Map</h2>
-            <p style={{ marginTop: '16px', color: '#555' }}>45 shaded polygons loaded — full clickable map next upgrade</p>
+            <p style={{ marginTop: '24px', color: '#555' }}>45 shaded polygons loaded from your KML</p>
+            <p style={{ marginTop: '8px', color: '#888' }}>Full clickable version with zoom coming next upgrade</p>
           </div>
         )}
 
         {tab === "weather" && (
           <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
             <h2 style={{ fontSize: '24px', fontWeight: '600' }}>Weather & Irrigation Alerts</h2>
-            <p style={{ marginTop: '16px', color: '#555' }}>Real-time conditions coming next</p>
+            <p style={{ marginTop: '24px', color: '#555' }}>Real-time conditions + RDI recommendations coming next</p>
           </div>
         )}
 
@@ -127,6 +132,7 @@ export default function App() {
               <Printer style={{ width: '28px', height: '28px' }} />
               Generate Full PDF Report
             </button>
+            <p style={{ marginTop: '16px', color: '#666' }}>One-click printable report with all blocks, phenology & tasks</p>
           </div>
         )}
       </main>

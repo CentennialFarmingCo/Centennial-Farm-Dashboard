@@ -120,7 +120,7 @@ export default function App() {
       </main>
 
       <footer className="text-center text-xs text-stone-500 py-8 border-t bg-white">
-        Centennial Farming Company • 45 fields • 2026 Season • Built live on Vercel
+        Centennial Farming Company • 45 fields • 2026 Season • Built live on Vercel 🚜
       </footer>
     </div>
   );

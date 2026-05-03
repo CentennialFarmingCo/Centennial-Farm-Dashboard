@@ -1,0 +1,56 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-03T23:17:28.436Z",
+    "available": false,
+    "reason": "No CIMIS_APP_KEY configured at build time. Set CIMIS_APP_KEY (and optionally CIMIS_STATION) to fetch live chill portions and pest degree-day totals. See README \"Seasonal Models\" section.",
+    "configHint": {
+      "requiredEnv": [
+        "CIMIS_APP_KEY"
+      ],
+      "optionalEnv": [
+        "CIMIS_STATION",
+        "CHILL_SEASON_START",
+        "CHILL_SEASON_END",
+        "PHENOLOGY_START_DATE",
+        "PHENOLOGY_END_DATE",
+        "DEGREE_DAY_BIOFIX_PEACH",
+        "DEGREE_DAY_BIOFIX_ALMOND"
+      ],
+      "chillSeason": {
+        "start": "2025-11-01",
+        "end": "2026-03-01"
+      },
+      "degreeDayWindow": {
+        "start": "2026-01-01",
+        "end": "2026-05-03"
+      },
+      "stationId": "148"
+    },
+    "models": {
+      "peachTwigBorer": {
+        "pest": "Peach twig borer (Anarsia lineatella)",
+        "lowerF": 50,
+        "upperF": 88,
+        "method": "single-sine, horizontal cutoff",
+        "sourceUrl": "https://ipm.ucanr.edu/WEATHER/ddretrievetext.html",
+        "appliesTo": [
+          "Freestone Peach",
+          "Cling Peach"
+        ]
+      },
+      "navelOrangeworm": {
+        "pest": "Navel orangeworm (Amyelois transitella)",
+        "lowerF": 55,
+        "upperF": 94,
+        "method": "single-sine, horizontal cutoff",
+        "sourceUrl": "https://ipm.ucanr.edu/weather/pest-and-plant-models/?MODEL=NOW&CROP=almonds",
+        "appliesTo": [
+          "Almond"
+        ]
+      }
+    }
+  },
+  "chill": null,
+  "degreeDays": null,
+  "blocks": []
+}

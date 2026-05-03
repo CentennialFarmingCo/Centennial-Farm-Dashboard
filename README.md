@@ -20,6 +20,10 @@ Next.js (static export) so it can be hosted free on Vercel with no server.
 - **Weather** — current conditions and a 5-day forecast for your farm,
   fetched live in the browser from [Open-Meteo](https://open-meteo.com/)
   (free, no API key).
+- **Seasonal Models** — per-block winter chill portions (Dynamic Model) and
+  pest degree-day totals (peach twig borer for peach blocks, navel orangeworm
+  for almond blocks), generated at build time from CIMIS station data. See
+  the *Seasonal Models* section below.
 - **PDF Report** — uses the browser's Print dialog.
 
 ## Running locally
@@ -204,6 +208,94 @@ bounding box, so re-run it whenever field boundaries change (i.e. after
 `npm run map:build`). Commit `public/irrigation-districts.geojson` and
 `public/irrigation-summary.json` together.
 
+## Seasonal Models (winter chill + pest degree-days)
+
+The **Seasonal Models** tab reports per-block:
+
+- **Winter chill portions** computed with the *Dynamic Model* of Fishman,
+  Erez & Couvillon (1987), the model UC Davis Fruit & Nut Center recommends
+  for California stone-fruit and almond chill accumulation tracking.
+- **Peach twig borer** (PTB) cumulative degree-days for peach blocks
+  (UC IPM thresholds: lower **50°F**, upper **88°F**).
+- **Navel orangeworm** (NOW) cumulative degree-days for almond blocks
+  (UC IPM thresholds: lower **55°F**, upper **94°F**).
+
+Both pest models use the **single-sine method with horizontal cutoff**, the
+default UC IPM degree-day calculation. Mixed/other-crop blocks are shown
+with `N/A` for the pest model rather than fabricated values.
+
+Data file (static, generated at build time): `public/phenology-summary.json`.
+
+**Source:** [California Irrigation Management Information System (CIMIS)](https://et.water.ca.gov/)
+hourly + daily air temperature, station-level data, retrieved via the CIMIS
+Web API. The CIMIS Web API requires a free **AppKey** — register at
+<https://et.water.ca.gov/Home/Register>.
+
+**References:**
+
+- Dynamic Model — Fishman, S., Erez, A., & Couvillon, G.A. (1987). *The
+  temperature dependence of dormancy breaking in plants: Mathematical
+  analysis of a two-step model involving a cooperative transition.*
+  J. Theor. Biol. 124(4):473–483.
+- UC Davis Fruit & Nut Center — chill portions:
+  <https://fruitsandnuts.ucdavis.edu/about-chilling-hours-units-and-portions>
+- UC IPM degree-day concepts and calculator:
+  <https://ipm.ucanr.edu/WEATHER/abtddcalc.html>,
+  <https://ipm.ucanr.edu/weather/ddconcepts.html>
+- UC IPM single-sine + horizontal cutoff:
+  <https://ipm.ucanr.edu/WEATHER/ddss-cutoff.html>
+- UC IPM peach twig borer:
+  <https://ipm.ucanr.edu/WEATHER/ddretrievetext.html>
+- UC IPM navel orangeworm (almonds):
+  <https://ipm.ucanr.edu/weather/pest-and-plant-models/?MODEL=NOW&CROP=almonds>
+
+**Caveat:** Chill portion and pest degree-day estimates are
+**decision-support** only. They reflect a single weather station applied
+to every block (orchard microclimate may differ), and biofix dates are
+configurable defaults rather than trap-confirmed events. Always confirm
+with UC IPM, your PCA, and on-orchard scouting before scheduling sprays
+or judging chill satisfaction.
+
+### Configuring CIMIS access
+
+The CIMIS AppKey is a build-time secret — it is **never** shipped to the
+browser. Set it in whichever environment runs `npm run phenology:build`:
+
+| Environment | Where to set it |
+| --- | --- |
+| **Vercel** | Project → Settings → Environment Variables → `CIMIS_APP_KEY` (mark *not* `NEXT_PUBLIC_*` so it stays server/build-only). Re-deploy to refresh. |
+| **GitHub Actions** | Repo → Settings → Secrets → Actions → `CIMIS_APP_KEY`. Reference as `${{ secrets.CIMIS_APP_KEY }}` in the workflow that runs `phenology:build`. |
+| **Local** | `export CIMIS_APP_KEY=…` in your shell, or put it in a local `.env` (already git-ignored). |
+
+| Variable | Required | Default | Purpose |
+| --- | --- | --- | --- |
+| `CIMIS_APP_KEY` | **yes** | — | Personal CIMIS Web API key. Without it, the build writes an *unavailable* JSON and the dashboard renders an unavailable state. |
+| `CIMIS_STATION` | no | `148` | CIMIS station number (default: Merced II). [Station list](https://cimis.water.ca.gov/Stations.aspx). |
+| `CHILL_SEASON_START` | no | `Nov 1` of prior year | Start of chill accumulation window (`YYYY-MM-DD`). |
+| `CHILL_SEASON_END` | no | `Mar 1` of current year | End of chill accumulation window. |
+| `PHENOLOGY_START_DATE` | no | `Jan 1` of current year | Default biofix / DD window start. |
+| `PHENOLOGY_END_DATE` | no | today | DD window end. |
+| `DEGREE_DAY_BIOFIX_PEACH` | no | `PHENOLOGY_START_DATE` | Per-pest biofix override for peach twig borer. |
+| `DEGREE_DAY_BIOFIX_ALMOND` | no | `PHENOLOGY_START_DATE` | Per-pest biofix override for navel orangeworm. |
+
+### Refreshing seasonal data
+
+```bash
+npm install
+export CIMIS_APP_KEY=YOUR_KEY            # build-time secret — do not commit
+npm run phenology:build                   # fetches CIMIS, computes chill + DD, writes JSON
+npm run phenology:validate                # sanity-checks the JSON (no fake values, thresholds match UC IPM)
+```
+
+If `CIMIS_APP_KEY` is unset (or the CIMIS API is unreachable), the build
+writes an *unavailable*-state `phenology-summary.json` (no chill / DD
+numbers) so the dashboard can still build cleanly and render a clearly
+labeled "data unavailable" panel with setup instructions. The validator
+also passes in this state.
+
+Commit the regenerated `public/phenology-summary.json` together with any
+other refresh.
+
 ## Scripts
 
 ```bash
@@ -217,4 +309,6 @@ npm run soil:build          # regenerate public/soils.geojson + soil-summary.jso
 npm run soil:validate       # sanity-check the soil files
 npm run districts:build     # regenerate public/irrigation-districts.geojson + irrigation-summary.json from CA DWR
 npm run districts:validate  # sanity-check the district files
+npm run phenology:build     # regenerate public/phenology-summary.json from CIMIS (requires CIMIS_APP_KEY)
+npm run phenology:validate  # sanity-check the phenology file
 ```

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useId } from "react";
-import { Sprout, MapPin, Sun, Cloud, FileText, Printer, AlertTriangle } from "lucide-react";
+import { Sprout, MapPin, Sun, Cloud, FileText, Printer, AlertTriangle, Snowflake } from "lucide-react";
 import {
   FIELDS,
   totalFields,
@@ -15,6 +15,7 @@ import {
 } from "./stats";
 import BlockExplorer from "./BlockExplorer";
 import Weather from "./Weather";
+import SeasonalModels from "./SeasonalModels";
 
 export default function App() {
   const [tab, setTab] = useState("today");
@@ -25,6 +26,7 @@ export default function App() {
     { id: "blocks", label: "Blocks", icon: MapPin },
     { id: "map", label: "Map", icon: Sprout },
     { id: "weather", label: "Weather", icon: Cloud },
+    { id: "seasonal", label: "Seasonal Models", icon: Snowflake },
     { id: "report", label: "PDF Report", icon: FileText },
   ];
 
@@ -265,6 +267,15 @@ export default function App() {
           hidden={tab !== "weather"}
         >
           {tab === "weather" && <Weather />}
+        </section>
+
+        <section
+          role="tabpanel"
+          id={`${tablistId}-panel-seasonal`}
+          aria-labelledby={`${tablistId}-tab-seasonal`}
+          hidden={tab !== "seasonal"}
+        >
+          {tab === "seasonal" && <SeasonalModels />}
         </section>
 
         <section

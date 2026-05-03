@@ -13,7 +13,9 @@
     "soil:build": "node scripts/build-soils.mjs",
     "soil:validate": "node scripts/validate-soils.mjs",
     "districts:build": "node scripts/build-districts.mjs",
-    "districts:validate": "node scripts/validate-districts.mjs"
+    "districts:validate": "node scripts/validate-districts.mjs",
+    "phenology:build": "node scripts/build-phenology.mjs",
+    "phenology:validate": "node scripts/validate-phenology.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

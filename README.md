@@ -297,7 +297,17 @@ If `CIMIS_APP_KEY` is unset (or the CIMIS API is unreachable), the build
 writes an *unavailable*-state `phenology-summary.json` (no chill / DD
 numbers) so the dashboard can still build cleanly and render a clearly
 labeled "data unavailable" panel with setup instructions. The validator
-also passes in this state.
+also passes in this state. The script always exits `0` so a CIMIS
+outage never fails Vercel/CI builds; the JSON's `metadata.errorKind`
+field plus the `[phenology]` log lines explain why (`missing-key`,
+`auth`, `network`, `bad-date`, `no-data`, `cimis-server-error`,
+`rate-limited`, `unexpected`, …). The CIMIS AppKey is redacted from any
+error text written to logs or the JSON.
+
+Hourly fetches are split into ≤60-day chunks to stay under the CIMIS
+Web API's 1,750-record-per-request cap (the chill-season window of
+Nov 1 → Mar 1 returns ~2,880 hourly records and would otherwise be
+rejected as a single request).
 
 Committing the regenerated `public/phenology-summary.json` is optional —
 Vercel's `prebuild` step will overwrite it on every deploy with fresh

@@ -41,6 +41,12 @@ This is a Next.js static export (`output: 'export'` in `next.config.js`). On
 Vercel, just import the repo — no special settings needed. The build produces
 a fully static site in `out/`.
 
+`npm run build` runs `phenology:build` automatically (via npm's `prebuild`
+lifecycle), so each Vercel build regenerates `public/phenology-summary.json`
+from the live CIMIS API using `CIMIS_APP_KEY` from the project's environment
+variables. If the key isn't set the script writes an *unavailable*-state
+JSON and the build still succeeds (see "Seasonal Models").
+
 ## Configuring your farm location (weather)
 
 The weather panel pulls live data from Open-Meteo for a single point. The
@@ -263,7 +269,7 @@ browser. Set it in whichever environment runs `npm run phenology:build`:
 
 | Environment | Where to set it |
 | --- | --- |
-| **Vercel** | Project → Settings → Environment Variables → `CIMIS_APP_KEY` (mark *not* `NEXT_PUBLIC_*` so it stays server/build-only). Re-deploy to refresh. |
+| **Vercel** | Project → Settings → Environment Variables → `CIMIS_APP_KEY` (mark *not* `NEXT_PUBLIC_*` so it stays server/build-only). Apply to **Production** and **Preview**. The `prebuild` step regenerates the JSON on every deploy — redeploy to refresh. |
 | **GitHub Actions** | Repo → Settings → Secrets → Actions → `CIMIS_APP_KEY`. Reference as `${{ secrets.CIMIS_APP_KEY }}` in the workflow that runs `phenology:build`. |
 | **Local** | `export CIMIS_APP_KEY=…` in your shell, or put it in a local `.env` (already git-ignored). |
 
@@ -293,8 +299,10 @@ numbers) so the dashboard can still build cleanly and render a clearly
 labeled "data unavailable" panel with setup instructions. The validator
 also passes in this state.
 
-Commit the regenerated `public/phenology-summary.json` together with any
-other refresh.
+Committing the regenerated `public/phenology-summary.json` is optional —
+Vercel's `prebuild` step will overwrite it on every deploy with fresh
+CIMIS data. Commit it only if you want to ship the most recent values
+without waiting for the next deploy.
 
 ## Scripts
 

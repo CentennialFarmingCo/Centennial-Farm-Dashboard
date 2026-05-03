@@ -10,9 +10,12 @@ Next.js (static export) so it can be hosted free on Vercel with no server.
   the largest blocks; and a data-quality panel that flags issues in
   `app/fields.js`.
 - **Blocks** — a card list of every block.
-- **Map** — an interactive *block explorer* with search, filters by crop /
-  ranch / variety, and a tile size proportional to acreage. Click any tile to
-  see full details.
+- **Map** — an interactive map of every field, drawn from real Google
+  Earth boundaries (`public/Farming-Field-Map.kml`). Click a polygon to
+  open its details. Below the map, a *block explorer* with search,
+  filters by crop / ranch / variety, and tile size proportional to
+  acreage gives you another way to compare blocks. Filters apply to
+  both the map and the tile grid.
 - **Weather** — current conditions and a 5-day forecast for your farm,
   fetched live in the browser from [Open-Meteo](https://open-meteo.com/)
   (free, no API key).
@@ -64,23 +67,50 @@ All field data lives in `app/fields.js`. Each entry has:
 
 Edit that file and the Today, Blocks, and Map tabs will update automatically.
 
-## Adding real field-boundary polygons (later)
+## Field-boundary map
 
-The Map tab today is a *block explorer*, not a true geographic map — tile
-size is proportional to acreage, but the layout is not the real shape of
-each field on the ground. To show real farm boundaries, you'll need polygon
-data in KML or GeoJSON form.
+The Map tab renders the real field boundaries from a Google Earth KML
+file. There are two static assets in `public/`:
 
-When that data is ready:
+- `public/Farming-Field-Map.kml` — the original Google Earth export.
+- `public/fields.geojson` — the same data converted to GeoJSON, with
+  each polygon's properties (block, ranch, variety, crop, acres) joined
+  to `app/fields.js` by block name. The map fetches this file at
+  runtime.
 
-1. Drop the file in `app/` (e.g. `app/boundaries.geojson`).
-2. Match each polygon's `name`/`id` property to a `block` value from
-   `app/fields.js`.
-3. We can then swap the explorer for a real map (e.g. Leaflet) and shade
-   each polygon by ranch, crop, or any KPI.
+The map projection is a simple equirectangular projection of the KML
+coordinates onto an SVG canvas (no map tiles, no API keys, fully
+compatible with `output: 'export'`). Polygons are drawn from the KML
+exactly as exported — they are not redrawn or simplified.
 
-Until then the explorer gives you searchable, filterable, click-to-inspect
-access to every block.
+### Updating the map when boundaries change
+
+1. Open `public/Farming-Field-Map.kml` in Google Earth, edit the
+   placemarks, and export the file back to the same path. Each
+   placemark's name should keep the format
+   `Field N - {Ranch} Block X - {Variety} {Crop} - {Acres} acres` so
+   the converter can match it to `app/fields.js`. (The converter falls
+   back to matching by field number if the block name doesn't match,
+   and surfaces unmatched placemarks on the dashboard.)
+2. Regenerate the GeoJSON:
+
+   ```bash
+   npm run map:build
+   ```
+
+   This runs `scripts/kml-to-geojson.mjs`, which prints the polygon
+   count and a list of any unmatched names.
+3. Commit both files (`public/Farming-Field-Map.kml` and
+   `public/fields.geojson`).
+
+### Adding a new field
+
+1. Add a row to `app/fields.js` with a unique `id` and a `block` value
+   that matches the KML placemark's middle segment (e.g.
+   `"Johnston Block 1"`).
+2. Draw the polygon in Google Earth, name it using the format above,
+   and re-export the KML.
+3. Run `npm run map:build` and commit the result.
 
 ## Scripts
 
@@ -89,4 +119,5 @@ npm run dev        # local dev
 npm run build      # static export build
 npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
+npm run map:build  # regenerate public/fields.geojson from the KML
 ```

@@ -1,0 +1,996 @@
+{
+  "metadata": {
+    "source": "California DWR — Water Districts (i03_WaterDistricts)",
+    "sourceUrl": "https://gis.water.ca.gov/arcgis/rest/services/Boundaries/i03_WaterDistricts/FeatureServer/0",
+    "retrievedAt": "2026-05-03T21:06:34.535Z",
+    "method": "ArcGIS FeatureServer query with esriSpatialRelIntersects against the field AOI envelope; features returned in WGS84 (EPSG:4326) GeoJSON, then clipped to field polygons via polygon-clipping (Greiner-Hormann)",
+    "aoiBbox": [
+      -120.78271166048839,
+      37.3586295202637,
+      -120.56633207628511,
+      37.48158237622651
+    ],
+    "caveat": "Boundaries shown are public-agency service-area boundaries published by the California Department of Water Resources. They do not represent actual delivery accounts, parcel-level service, or guaranteed surface-water availability. Confirm with the agency before relying on this overlay for operational decisions.",
+    "fieldCount": 45,
+    "districtCount": 11,
+    "districtsInAoi": [
+      {
+        "agencyName": "Winton Water And Sanitary District",
+        "agencyUniqueId": 2757,
+        "category": "sanitary_district",
+        "source": "CDPH"
+      },
+      {
+        "agencyName": "Atwater City Of",
+        "agencyUniqueId": 110,
+        "category": "municipal",
+        "source": "SCRO"
+      },
+      {
+        "agencyName": "Merced Irrigation District",
+        "agencyUniqueId": 1591,
+        "category": "irrigation_district",
+        "source": "SERYSIAN"
+      },
+      {
+        "agencyName": "EVERGREEN MOBILE HOME PARK",
+        "agencyUniqueId": 5234,
+        "category": "private_system",
+        "source": "SWRCB"
+      },
+      {
+        "agencyName": "Eastside Water District",
+        "agencyUniqueId": 802,
+        "category": "water_district",
+        "source": "SCRO"
+      },
+      {
+        "agencyName": "Livingston City of",
+        "agencyUniqueId": 1444,
+        "category": "municipal",
+        "source": "SERYSIAN"
+      },
+      {
+        "agencyName": "Turlock Irrigation District",
+        "agencyUniqueId": 2525,
+        "category": "irrigation_district",
+        "source": "SCRO"
+      },
+      {
+        "agencyName": "Delhi County Water District",
+        "agencyUniqueId": 716,
+        "category": "water_district",
+        "source": "SCRO"
+      },
+      {
+        "agencyName": "Ballico Community Service District",
+        "agencyUniqueId": 126,
+        "category": "community_services",
+        "source": "NorCal Private"
+      },
+      {
+        "agencyName": "Ballico-Cortez Water District",
+        "agencyUniqueId": 127,
+        "category": "water_district",
+        "source": "SCRO"
+      },
+      {
+        "agencyName": "US Air Force Castle Air Force Base",
+        "agencyUniqueId": 2546,
+        "category": "federal",
+        "source": "CDPH"
+      }
+    ]
+  },
+  "fields": [
+    {
+      "fieldId": 1,
+      "block": "Johnston Block 1",
+      "ranch": "Johnston",
+      "reportedAcres": 33,
+      "polygonAcres": 33.56,
+      "districtCoverageAcres": 33.56,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 33.562,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 2,
+      "block": "Johnston Block 2",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 20.9,
+      "districtCoverageAcres": 20.9,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 20.897,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 3,
+      "block": "Johnston Block 3A",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 20.79,
+      "districtCoverageAcres": 20.79,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 20.794,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 4,
+      "block": "Johnston Block 3B",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 15.72,
+      "districtCoverageAcres": 15.72,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 15.724,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 5,
+      "block": "Johnston Block 4",
+      "ranch": "Johnston",
+      "reportedAcres": 13,
+      "polygonAcres": 12.5,
+      "districtCoverageAcres": 12.5,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 12.501,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 6,
+      "block": "Johnston Block 5A",
+      "ranch": "Johnston",
+      "reportedAcres": 15,
+      "polygonAcres": 11.84,
+      "districtCoverageAcres": 11.84,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 11.845,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 7,
+      "block": "Johnston Block 5B",
+      "ranch": "Johnston",
+      "reportedAcres": 15,
+      "polygonAcres": 13.75,
+      "districtCoverageAcres": 13.75,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 13.747,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 8,
+      "block": "Johnston Block 56/58",
+      "ranch": "Johnston",
+      "reportedAcres": 30,
+      "polygonAcres": 30.82,
+      "districtCoverageAcres": 30.82,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 30.82,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 9,
+      "block": "Johnston Block 36A",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 19.53,
+      "districtCoverageAcres": 19.53,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 19.525,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 10,
+      "block": "Johnston Block 36B",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 17.44,
+      "districtCoverageAcres": 17.44,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 17.437,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 11,
+      "block": "Johnston Block 39",
+      "ranch": "Johnston",
+      "reportedAcres": 17,
+      "polygonAcres": 16.37,
+      "districtCoverageAcres": 16.37,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 16.37,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 12,
+      "block": "Johnston Block 40",
+      "ranch": "Johnston",
+      "reportedAcres": 21,
+      "polygonAcres": 19.59,
+      "districtCoverageAcres": 19.59,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 19.593,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 13,
+      "block": "Johnston Block 35",
+      "ranch": "Johnston",
+      "reportedAcres": 17,
+      "polygonAcres": 16.08,
+      "districtCoverageAcres": 16.08,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 16.083,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 14,
+      "block": "Blue Lupin Block 17",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 21,
+      "polygonAcres": 20.73,
+      "districtCoverageAcres": 20.73,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 20.735,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 15,
+      "block": "Blue Lupin Block 18",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 19,
+      "polygonAcres": 19.68,
+      "districtCoverageAcres": 19.68,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 19.68,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 16,
+      "block": "Blue Lupin Block 19",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 35,
+      "polygonAcres": 34.2,
+      "districtCoverageAcres": 34.2,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 34.202,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 17,
+      "block": "Blue Lupin Block 21",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 23.5,
+      "polygonAcres": 23.68,
+      "districtCoverageAcres": 23.68,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 23.676,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 18,
+      "block": "Blue Lupin Block 10",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 30,
+      "polygonAcres": 28.69,
+      "districtCoverageAcres": 28.69,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 28.695,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 19,
+      "block": "Blue Lupin Block 8/9",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 38.5,
+      "polygonAcres": 38.08,
+      "districtCoverageAcres": 38.08,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Turlock Irrigation District",
+          "agencyUniqueId": 2525,
+          "source": "SCRO",
+          "dateApplies": "2013-11-07",
+          "category": "irrigation_district",
+          "acres": 38.077,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 20,
+      "block": "Fagundes Block 64A",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 18.88,
+      "districtCoverageAcres": 18.88,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 18.88,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 21,
+      "block": "Fagundes Block 64B",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 19.62,
+      "districtCoverageAcres": 19.62,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 19.619,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 22,
+      "block": "Fagundes Block 65B",
+      "ranch": "Fagundes",
+      "reportedAcres": 14,
+      "polygonAcres": 12.97,
+      "districtCoverageAcres": 12.97,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 12.965,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 23,
+      "block": "Fagundes Block 65A",
+      "ranch": "Fagundes",
+      "reportedAcres": 13,
+      "polygonAcres": 13.08,
+      "districtCoverageAcres": 13.08,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 13.076,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 24,
+      "block": "Fagundes Block 67A",
+      "ranch": "Fagundes",
+      "reportedAcres": 18,
+      "polygonAcres": 17.38,
+      "districtCoverageAcres": 17.38,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 17.38,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 25,
+      "block": "Fagundes Block 67B",
+      "ranch": "Fagundes",
+      "reportedAcres": 15,
+      "polygonAcres": 15.32,
+      "districtCoverageAcres": 15.32,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 15.316,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 26,
+      "block": "Fagundes Block 70A",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 21.46,
+      "districtCoverageAcres": 21.46,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 21.46,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 27,
+      "block": "Fagundes Block 70B",
+      "ranch": "Fagundes",
+      "reportedAcres": 19,
+      "polygonAcres": 16.39,
+      "districtCoverageAcres": 16.39,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 16.392,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 28,
+      "block": "Fagundes Block 71",
+      "ranch": "Fagundes",
+      "reportedAcres": 9,
+      "polygonAcres": 9.45,
+      "districtCoverageAcres": 9.45,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 9.446,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 29,
+      "block": "Fagundes Block 72A",
+      "ranch": "Fagundes",
+      "reportedAcres": 16,
+      "polygonAcres": 17.59,
+      "districtCoverageAcres": 17.59,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 17.593,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 30,
+      "block": "Fagundes Block 72B",
+      "ranch": "Fagundes",
+      "reportedAcres": 11,
+      "polygonAcres": 9.55,
+      "districtCoverageAcres": 9.55,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 9.549,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 31,
+      "block": "Fagundes Block 73",
+      "ranch": "Fagundes",
+      "reportedAcres": 19,
+      "polygonAcres": 18.75,
+      "districtCoverageAcres": 18.75,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 18.753,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 32,
+      "block": "Fagundes Block 74A",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 20.07,
+      "districtCoverageAcres": 20.07,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 20.073,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 33,
+      "block": "Fagundes Block 74B",
+      "ranch": "Fagundes",
+      "reportedAcres": 22,
+      "polygonAcres": 22.56,
+      "districtCoverageAcres": 22.56,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 22.561,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 34,
+      "block": "Fagundes Block 76A",
+      "ranch": "Fagundes",
+      "reportedAcres": 10,
+      "polygonAcres": 11.42,
+      "districtCoverageAcres": 11.42,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 11.418,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 35,
+      "block": "Fagundes Block 76B",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 19.86,
+      "districtCoverageAcres": 19.86,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 19.863,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 36,
+      "block": "Fagundes Block 66",
+      "ranch": "Fagundes",
+      "reportedAcres": 27,
+      "polygonAcres": 26.91,
+      "districtCoverageAcres": 26.91,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 26.911,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 37,
+      "block": "Fagundes Block 68",
+      "ranch": "Fagundes",
+      "reportedAcres": 35,
+      "polygonAcres": 34.28,
+      "districtCoverageAcres": 34.28,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 34.279,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 38,
+      "block": "Fagundes Block 75",
+      "ranch": "Fagundes",
+      "reportedAcres": 26,
+      "polygonAcres": 25.31,
+      "districtCoverageAcres": 25.31,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 25.309,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 39,
+      "block": "Fagundes Block 77",
+      "ranch": "Fagundes",
+      "reportedAcres": 26,
+      "polygonAcres": 26.37,
+      "districtCoverageAcres": 26.37,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 26.366,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 40,
+      "block": "Fagundes Block 61",
+      "ranch": "Fagundes",
+      "reportedAcres": 17,
+      "polygonAcres": 16.58,
+      "districtCoverageAcres": 16.58,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 16.581,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 41,
+      "block": "Fagundes Block 62",
+      "ranch": "Fagundes",
+      "reportedAcres": 27,
+      "polygonAcres": 26.49,
+      "districtCoverageAcres": 26.49,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 26.493,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 42,
+      "block": "Fagundes Block 63",
+      "ranch": "Fagundes",
+      "reportedAcres": 32,
+      "polygonAcres": 31.14,
+      "districtCoverageAcres": 31.14,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 31.143,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 43,
+      "block": "Fagundes Block 60",
+      "ranch": "Fagundes",
+      "reportedAcres": 28,
+      "polygonAcres": 27.59,
+      "districtCoverageAcres": 27.59,
+      "coveragePct": 100,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 27.589,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 44,
+      "block": "Fagundes Mello",
+      "ranch": "Mello",
+      "reportedAcres": 35,
+      "polygonAcres": 35.21,
+      "districtCoverageAcres": 32.93,
+      "coveragePct": 93.5,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 32.927,
+          "percent": 93.5
+        }
+      ]
+    },
+    {
+      "fieldId": 45,
+      "block": "Fagundes Angel Ranch",
+      "ranch": "Angel Ranch",
+      "reportedAcres": 17,
+      "polygonAcres": 19.29,
+      "districtCoverageAcres": 19.4,
+      "coveragePct": 100.6,
+      "components": [
+        {
+          "agencyName": "Merced Irrigation District",
+          "agencyUniqueId": 1591,
+          "source": "SERYSIAN",
+          "dateApplies": "2016-08-05",
+          "category": "irrigation_district",
+          "acres": 19.294,
+          "percent": 100
+        },
+        {
+          "agencyName": "US Air Force Castle Air Force Base",
+          "agencyUniqueId": 2546,
+          "source": "CDPH",
+          "dateApplies": "2013-06-14",
+          "category": "federal",
+          "acres": 0.107,
+          "percent": 0.6
+        }
+      ]
+    }
+  ]
+}

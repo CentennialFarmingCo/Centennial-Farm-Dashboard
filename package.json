@@ -11,7 +11,9 @@
     "map:build": "node scripts/kml-to-geojson.mjs",
     "map:validate": "node scripts/validate-geojson.mjs",
     "soil:build": "node scripts/build-soils.mjs",
-    "soil:validate": "node scripts/validate-soils.mjs"
+    "soil:validate": "node scripts/validate-soils.mjs",
+    "districts:build": "node scripts/build-districts.mjs",
+    "districts:validate": "node scripts/validate-districts.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

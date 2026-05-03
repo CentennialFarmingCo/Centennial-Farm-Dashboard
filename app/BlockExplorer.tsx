@@ -4,6 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { FIELDS, formatAcres, type Field } from "./stats";
 import FieldMap from "./FieldMap";
 import { soilColor, type FieldSoilSummary, type SoilSummaryDoc } from "./soils";
+import {
+  DISTRICT_CATEGORY_LABELS,
+  districtColor,
+  IRRIGATION_RELEVANT,
+  type DistrictSummaryDoc,
+  type FieldDistrictSummary,
+} from "./districts";
 
 const RANCH_COLORS: Record<string, string> = {
   Johnston: '#C55A2E',
@@ -34,6 +41,7 @@ export default function BlockExplorer() {
   const [query, setQuery] = useState<string>('');
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [soilSummary, setSoilSummary] = useState<SoilSummaryDoc | null>(null);
+  const [districtSummary, setDistrictSummary] = useState<DistrictSummaryDoc | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,11 +52,26 @@ export default function BlockExplorer() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch('irrigation-summary.json')
+      .then(r => r.ok ? r.json() : null)
+      .then((json: DistrictSummaryDoc | null) => { if (!cancelled && json) setDistrictSummary(json); })
+      .catch(() => {/* district panel just won't show */});
+    return () => { cancelled = true; };
+  }, []);
+
   const soilByFieldId = useMemo(() => {
     const m = new Map<number, FieldSoilSummary>();
     for (const f of soilSummary?.fields ?? []) m.set(f.fieldId, f);
     return m;
   }, [soilSummary]);
+
+  const districtByFieldId = useMemo(() => {
+    const m = new Map<number, FieldDistrictSummary>();
+    for (const f of districtSummary?.fields ?? []) m.set(f.fieldId, f);
+    return m;
+  }, [districtSummary]);
 
   const crops = useMemo(
     () => Array.from(new Set(FIELDS.map(f => f.crop))).sort(),
@@ -102,10 +125,11 @@ export default function BlockExplorer() {
       >
         <strong>Field boundaries from Google Earth, on satellite imagery.</strong>{' '}
         Polygons come from <code>public/Farming-Field-Map.kml</code> and are
-        drawn over Esri World Imagery. Toggle the <strong>Soils</strong> button
-        on the map to overlay USDA NRCS SSURGO soil map units, colored by
-        hydrologic group. Click a polygon (or a tile below) to focus a
-        block — its soil composition appears in the details card.
+        drawn over Esri World Imagery. Toggle <strong>Soils</strong> for USDA
+        NRCS SSURGO map units (by hydrologic group), or{' '}
+        <strong>Districts</strong> for California DWR water/irrigation
+        district boundaries. Click a polygon (or a tile below) to focus a
+        block — its soil and district composition appear in the details card.
       </div>
 
       <div
@@ -308,6 +332,7 @@ export default function BlockExplorer() {
                 </div>
               </dl>
               <SoilComposition summary={soilByFieldId.get(selected.id) ?? null} />
+              <DistrictComposition summary={districtByFieldId.get(selected.id) ?? null} />
             </div>
           ) : (
             <div>
@@ -409,6 +434,113 @@ function SoilComposition({ summary }: { summary: FieldSoilSummary | null }) {
       <p style={{ fontSize: '10px', color: '#888', margin: '8px 0 0', lineHeight: 1.4 }}>
         Source: USDA NRCS SSURGO via Soil Data Access. Survey lines are
         approximate; not a substitute for on-site sampling.
+      </p>
+    </section>
+  );
+}
+
+function DistrictComposition({ summary }: { summary: FieldDistrictSummary | null }) {
+  if (!summary) return null;
+  const { components } = summary;
+
+  return (
+    <section
+      aria-label="Water district composition"
+      data-testid="district-composition"
+      style={{
+        marginTop: '16px',
+        paddingTop: '12px',
+        borderTop: '1px dashed #d8cfb6',
+      }}
+    >
+      <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#888', margin: '0 0 6px', letterSpacing: '0.04em' }}>
+        Water district (CA DWR)
+      </h4>
+      {components.length === 0 ? (
+        <p
+          style={{ fontSize: '12px', color: '#7a5b1a', margin: 0 }}
+          data-testid="district-empty"
+        >
+          No public district overlap found for this block.
+        </p>
+      ) : (
+        <>
+          <div
+            role="img"
+            aria-label={`District composition: ${components.map(c => `${c.percent}% ${c.agencyName}`).join(', ')}`}
+            style={{
+              display: 'flex',
+              height: '10px',
+              borderRadius: '5px',
+              overflow: 'hidden',
+              border: '1px solid #ddd',
+              marginBottom: '8px',
+            }}
+          >
+            {components.map(c => (
+              <span
+                key={c.agencyUniqueId ?? c.agencyName}
+                title={`${c.percent}% ${c.agencyName}`}
+                style={{
+                  flexBasis: `${Math.max(c.percent, 0.5)}%`,
+                  backgroundColor: districtColor(c.category),
+                }}
+              />
+            ))}
+          </div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '6px', fontSize: '12px' }}>
+            {components.map(c => {
+              const isIrrigation = IRRIGATION_RELEVANT.has(c.category);
+              return (
+                <li
+                  key={c.agencyUniqueId ?? c.agencyName}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '14px 1fr auto',
+                    gap: '8px',
+                    alignItems: 'flex-start',
+                  }}
+                >
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: '12px',
+                      height: '12px',
+                      marginTop: '3px',
+                      borderRadius: '3px',
+                      backgroundColor: districtColor(c.category),
+                      border: '1px solid rgba(0,0,0,0.15)',
+                    }}
+                  />
+                  <span>
+                    <strong style={{ color: isIrrigation ? '#1F78B4' : '#333' }}>
+                      {c.agencyName}
+                    </strong>
+                    <span
+                      style={{
+                        color: '#666',
+                        display: 'block',
+                        fontSize: '11px',
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {DISTRICT_CATEGORY_LABELS[c.category] ?? c.category}
+                      {c.source && <> · {c.source}</>}
+                    </span>
+                  </span>
+                  <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {c.percent}% · {formatAcres(c.acres)} ac
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+      <p style={{ fontSize: '10px', color: '#888', margin: '8px 0 0', lineHeight: 1.4 }}>
+        Source: California DWR Water Districts (i03_WaterDistricts). Public
+        agency service-area boundaries — confirm with the agency for actual
+        delivery accounts and surface-water availability.
       </p>
     </section>
   );

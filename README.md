@@ -161,15 +161,60 @@ box, so re-run it whenever field boundaries change (i.e. after
 `npm run map:build`). Commit `public/soils.geojson` and
 `public/soil-summary.json` together.
 
+## Irrigation / water district overlay (California DWR)
+
+The Map tab has an optional **Districts** overlay alongside Soils. It draws
+California water/irrigation district service-area boundaries from the
+California Department of Water Resources, colored by agency type
+(irrigation district, water district, mutual water company, municipal,
+etc.). Selecting a block reveals that field's per-district acreage and
+percent split in the details card. Blocks that fall outside any public
+district see a clear "No public district overlap found" message rather
+than fabricated data.
+
+Data files (both static, generated):
+
+- `public/irrigation-districts.geojson` — district polygons **clipped to
+  field boundaries**. Each feature carries the `agencyName`,
+  `agencyUniqueId`, `source`, boundary `dateApplies`, classified
+  `category`, and clipped acreage.
+- `public/irrigation-summary.json` — per-field district composition
+  (acres + percent split) keyed by `fieldId`, plus the full list of
+  districts intersecting the AOI.
+
+**Source:** [California DWR — Water Districts (i03_WaterDistricts)](https://gis.water.ca.gov/arcgis/rest/services/Boundaries/i03_WaterDistricts/FeatureServer/0)
+ArcGIS FeatureServer. No API key, no authentication, free public-agency
+data published by the California Department of Water Resources.
+
+**Caveat:** Boundaries shown are public-agency service-area boundaries.
+They do **not** represent actual delivery accounts, parcel-level
+service, or guaranteed surface-water availability. Confirm with the
+agency before relying on this overlay for operational decisions.
+
+### Refreshing district data
+
+```bash
+npm install                 # ensures polygon-clipping is available
+npm run districts:build     # fetches DWR districts for the field AOI, clips, writes JSON
+npm run districts:validate  # checks coverage, fieldId references, attribution metadata
+```
+
+`districts:build` reads `public/fields.geojson` to derive the AOI
+bounding box, so re-run it whenever field boundaries change (i.e. after
+`npm run map:build`). Commit `public/irrigation-districts.geojson` and
+`public/irrigation-summary.json` together.
+
 ## Scripts
 
 ```bash
-npm run dev           # local dev
-npm run build         # static export build
-npm run lint          # eslint
-npm run typecheck     # tsc --noEmit
-npm run map:build     # regenerate public/fields.geojson from the KML
-npm run map:validate  # sanity-check public/fields.geojson
-npm run soil:build    # regenerate public/soils.geojson + soil-summary.json from USDA SDA
-npm run soil:validate # sanity-check the soil files
+npm run dev                 # local dev
+npm run build               # static export build
+npm run lint                # eslint
+npm run typecheck           # tsc --noEmit
+npm run map:build           # regenerate public/fields.geojson from the KML
+npm run map:validate        # sanity-check public/fields.geojson
+npm run soil:build          # regenerate public/soils.geojson + soil-summary.json from USDA SDA
+npm run soil:validate       # sanity-check the soil files
+npm run districts:build     # regenerate public/irrigation-districts.geojson + irrigation-summary.json from CA DWR
+npm run districts:validate  # sanity-check the district files
 ```

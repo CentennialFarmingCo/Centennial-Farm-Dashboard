@@ -10,6 +10,14 @@ import {
   type SoilFeature,
   type SoilFeatureCollection,
 } from "./soils";
+import {
+  DISTRICT_CATEGORY_COLORS,
+  DISTRICT_CATEGORY_LABELS,
+  districtColor,
+  type DistrictCategory,
+  type DistrictFeature,
+  type DistrictFeatureCollection,
+} from "./districts";
 
 type FieldFeature = {
   type: 'Feature';
@@ -62,12 +70,16 @@ export default function FieldMap({
   const [soils, setSoils] = useState<SoilFeatureCollection | null>(null);
   const [soilError, setSoilError] = useState<string | null>(null);
   const [showSoils, setShowSoils] = useState<boolean>(false);
+  const [districts, setDistricts] = useState<DistrictFeatureCollection | null>(null);
+  const [districtsError, setDistrictsError] = useState<string | null>(null);
+  const [showDistricts, setShowDistricts] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [basemap, setBasemap] = useState<Basemap>('satellite');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const layerRef = useRef<LeafletGeoJSON | null>(null);
   const soilLayerRef = useRef<LeafletGeoJSON | null>(null);
+  const districtsLayerRef = useRef<LeafletGeoJSON | null>(null);
   const tileRef = useRef<{ satellite: LeafletTileLayer; streets: LeafletTileLayer } | null>(null);
   const boundsRef = useRef<LatLngBounds | null>(null);
   const idToLayerRef = useRef<globalThis.Map<number, Layer>>(new globalThis.Map());
@@ -112,6 +124,19 @@ export default function FieldMap({
       .catch(e => { if (!cancelled) setSoilError(String(e)); });
     return () => { cancelled = true; };
   }, [showSoils, soils, soilError]);
+
+  useEffect(() => {
+    if (!showDistricts || districts || districtsError) return;
+    let cancelled = false;
+    fetch('irrigation-districts.geojson')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((json: DistrictFeatureCollection) => { if (!cancelled) setDistricts(json); })
+      .catch(e => { if (!cancelled) setDistrictsError(String(e)); });
+    return () => { cancelled = true; };
+  }, [showDistricts, districts, districtsError]);
 
   const styleFor = useMemo(() => {
     return (feature: FieldFeature): PathOptions => {
@@ -208,6 +233,7 @@ export default function FieldMap({
         mapRef.current = null;
         layerRef.current = null;
         soilLayerRef.current = null;
+        districtsLayerRef.current = null;
         tileRef.current = null;
         idToLayerRef.current.clear();
       };
@@ -315,6 +341,60 @@ export default function FieldMap({
     return () => { cancelled = true; };
   }, [showSoils, soils]);
 
+  // Add or remove the irrigation/water district overlay layer.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    let cancelled = false;
+
+    if (!showDistricts || !districts) {
+      if (districtsLayerRef.current) {
+        map.removeLayer(districtsLayerRef.current);
+        districtsLayerRef.current = null;
+      }
+      return;
+    }
+    if (districtsLayerRef.current) return;
+
+    (async () => {
+      const L = (await import('leaflet')).default;
+      if (cancelled || !mapRef.current) return;
+      const layer = L.geoJSON(districts as unknown as GeoJSON.GeoJsonObject, {
+        style: (feat) => {
+          const f = feat as unknown as DistrictFeature;
+          const color = districtColor(f.properties.category);
+          return {
+            color,
+            weight: 1,
+            opacity: 0.85,
+            fillColor: color,
+            fillOpacity: 0.3,
+          } as PathOptions;
+        },
+        onEachFeature: (feat, lyr) => {
+          const f = feat as unknown as DistrictFeature;
+          const p = f.properties;
+          const lines = [
+            `<strong>${p.agencyName}</strong>`,
+            `${DISTRICT_CATEGORY_LABELS[p.category] ?? p.category}`,
+            p.source ? `Source: ${p.source}` : null,
+            p.dateApplies ? `Boundary date: ${p.dateApplies}` : null,
+            `${formatAcres(p.acres)} ac in this field`,
+          ].filter(Boolean).join('<br/>');
+          lyr.bindTooltip(lines, { sticky: true, direction: 'top', opacity: 0.95 });
+        },
+      });
+      layer.addTo(mapRef.current!);
+      // Keep field outlines on top so block identity stays readable.
+      if (layerRef.current) layerRef.current.bringToFront();
+      districtsLayerRef.current = layer;
+    })().catch(e => {
+      if (!cancelled) setDistrictsError(`District overlay failed: ${e}`);
+    });
+
+    return () => { cancelled = true; };
+  }, [showDistricts, districts]);
+
   const selectedFeature = useMemo(() => {
     if (!data || selectedId == null) return null;
     return data.features.find(f => f.properties.fieldId === selectedId) ?? null;
@@ -411,9 +491,23 @@ export default function FieldMap({
             label={showSoils ? 'Soils ✓' : 'Soils'}
             ariaLabel={showSoils ? 'Hide USDA soil overlay' : 'Show USDA soil overlay'}
           />
+          <BasemapBtn
+            active={showDistricts}
+            onClick={() => setShowDistricts(v => !v)}
+            label={showDistricts ? 'Districts ✓' : 'Districts'}
+            ariaLabel={showDistricts ? 'Hide water district overlay' : 'Show water district overlay'}
+          />
         </div>
         {showSoils && (
           <SoilLegend loading={!soils && !soilError} error={soilError} meta={soils?.metadata} />
+        )}
+        {showDistricts && (
+          <DistrictLegend
+            loading={!districts && !districtsError}
+            error={districtsError}
+            meta={districts?.metadata}
+            offset={showSoils}
+          />
         )}
         <div
           style={{
@@ -593,6 +687,101 @@ function SoilLegend({
             )}
             <br />
             Survey lines are approximate; not a substitute for field sampling.
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Categories to surface in the legend. We keep the list short — only those
+// that actually appear in the AOI today; rare categories will simply use the
+// "Other" swatch.
+const LEGEND_CATEGORIES: DistrictCategory[] = [
+  'irrigation_district',
+  'water_district',
+  'reclamation_district',
+  'mutual_water_company',
+  'community_services',
+  'municipal',
+  'sanitary_district',
+  'private_system',
+  'federal',
+];
+
+function DistrictLegend({
+  loading,
+  error,
+  meta,
+  offset,
+}: {
+  loading: boolean;
+  error: string | null;
+  meta: DistrictFeatureCollection['metadata'];
+  offset: boolean;
+}) {
+  return (
+    <div
+      role="region"
+      aria-label="California water district overlay legend"
+      style={{
+        position: 'absolute',
+        top: offset ? '296px' : '8px',
+        right: '8px',
+        zIndex: 500,
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        borderRadius: '8px',
+        padding: '8px 10px',
+        fontSize: '11px',
+        color: '#333',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+        maxWidth: '240px',
+      }}
+    >
+      <div style={{ fontWeight: 600, marginBottom: '4px', fontSize: '12px' }}>
+        Water districts — CA DWR
+      </div>
+      {loading && <div style={{ color: '#666' }}>Loading district data…</div>}
+      {error && <div style={{ color: '#a33' }}>Could not load districts: {error}</div>}
+      {!loading && !error && (
+        <>
+          <div style={{ color: '#555', marginBottom: '6px' }}>
+            Colored by agency type. Surface-water irrigation districts are
+            highlighted.
+          </div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '3px' }}>
+            {LEGEND_CATEGORIES.map(cat => (
+              <li key={cat} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '3px',
+                    backgroundColor: DISTRICT_CATEGORY_COLORS[cat],
+                    border: '1px solid rgba(0,0,0,0.2)',
+                  }}
+                />
+                <span>{DISTRICT_CATEGORY_LABELS[cat]}</span>
+              </li>
+            ))}
+          </ul>
+          <div style={{ color: '#777', marginTop: '6px', fontSize: '10px', lineHeight: 1.3 }}>
+            Source:{' '}
+            <a
+              href="https://gis.water.ca.gov/arcgis/rest/services/Boundaries/i03_WaterDistricts/FeatureServer/0"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: '#3F4F2C' }}
+            >
+              California DWR — Water Districts
+            </a>
+            {meta?.retrievedAt && (
+              <> · retrieved {meta.retrievedAt.slice(0, 10)}</>
+            )}
+            <br />
+            Public agency service-area boundaries — confirm with the agency
+            before relying on this for delivery accounts or operations.
           </div>
         </>
       )}

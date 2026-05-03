@@ -10,12 +10,13 @@ Next.js (static export) so it can be hosted free on Vercel with no server.
   the largest blocks; and a data-quality panel that flags issues in
   `app/fields.js`.
 - **Blocks** — a card list of every block.
-- **Map** — an interactive map of every field, drawn from real Google
-  Earth boundaries (`public/Farming-Field-Map.kml`). Click a polygon to
-  open its details. Below the map, a *block explorer* with search,
-  filters by crop / ranch / variety, and tile size proportional to
-  acreage gives you another way to compare blocks. Filters apply to
-  both the map and the tile grid.
+- **Map** — an interactive Leaflet map of every field, drawn from real
+  Google Earth boundaries (`public/Farming-Field-Map.kml`) overlaid on
+  Esri World Imagery satellite tiles (toggle to OpenStreetMap streets
+  if preferred). Click a polygon to open its details. Below the map, a
+  *block explorer* with search, filters by crop / ranch / variety, and
+  tile size proportional to acreage gives you another way to compare
+  blocks. Filters apply to both the map and the tile grid.
 - **Weather** — current conditions and a 5-day forecast for your farm,
   fetched live in the browser from [Open-Meteo](https://open-meteo.com/)
   (free, no API key).
@@ -78,10 +79,20 @@ file. There are two static assets in `public/`:
   to `app/fields.js` by block name. The map fetches this file at
   runtime.
 
-The map projection is a simple equirectangular projection of the KML
-coordinates onto an SVG canvas (no map tiles, no API keys, fully
-compatible with `output: 'export'`). Polygons are drawn from the KML
-exactly as exported — they are not redrawn or simplified.
+The map is rendered with [Leaflet](https://leafletjs.com/) on the
+client (dynamically imported so it never runs during the static
+export). Polygons are drawn from the KML exactly as exported — they
+are not redrawn or simplified — and projected from `[lon, lat]`
+GeoJSON coordinates onto Leaflet's `lat/lng` mercator layer (no
+flipping). The basemap uses two free, no-API-key tile sources:
+
+- **Satellite** (default): Esri World Imagery — Imagery © Esri,
+  Maxar, Earthstar Geographics, USDA, USGS, AeroGRID, IGN, GIS User
+  Community. Attribution is shown in the map's bottom-right corner.
+- **Streets**: © OpenStreetMap contributors.
+
+If tiles fail to load (e.g. offline), the polygons still render over
+a dark background and remain interactive.
 
 ### Updating the map when boundaries change
 
@@ -120,4 +131,5 @@ npm run build      # static export build
 npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
 npm run map:build  # regenerate public/fields.geojson from the KML
+npm run map:validate # sanity-check public/fields.geojson
 ```

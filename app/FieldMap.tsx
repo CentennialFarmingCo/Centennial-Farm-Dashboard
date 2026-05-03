@@ -3,6 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON, LatLngBounds, Layer, PathOptions, TileLayer as LeafletTileLayer, Path, Polygon } from "leaflet";
 import { formatAcres } from "./stats";
+import {
+  HYDROLOGIC_GROUP_COLORS,
+  HYDROLOGIC_GROUP_DESC,
+  soilColor,
+  type SoilFeature,
+  type SoilFeatureCollection,
+} from "./soils";
 
 type FieldFeature = {
   type: 'Feature';
@@ -52,11 +59,15 @@ export default function FieldMap({
   cropBg,
 }: Props) {
   const [data, setData] = useState<FieldsCollection | null>(null);
+  const [soils, setSoils] = useState<SoilFeatureCollection | null>(null);
+  const [soilError, setSoilError] = useState<string | null>(null);
+  const [showSoils, setShowSoils] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [basemap, setBasemap] = useState<Basemap>('satellite');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const layerRef = useRef<LeafletGeoJSON | null>(null);
+  const soilLayerRef = useRef<LeafletGeoJSON | null>(null);
   const tileRef = useRef<{ satellite: LeafletTileLayer; streets: LeafletTileLayer } | null>(null);
   const boundsRef = useRef<LatLngBounds | null>(null);
   const idToLayerRef = useRef<globalThis.Map<number, Layer>>(new globalThis.Map());
@@ -86,6 +97,21 @@ export default function FieldMap({
       .catch(e => { if (!cancelled) setError(String(e)); });
     return () => { cancelled = true; };
   }, []);
+
+  // Lazily fetch the soils overlay only when the user first toggles it on,
+  // so the static landing experience stays slim.
+  useEffect(() => {
+    if (!showSoils || soils || soilError) return;
+    let cancelled = false;
+    fetch('soils.geojson')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((json: SoilFeatureCollection) => { if (!cancelled) setSoils(json); })
+      .catch(e => { if (!cancelled) setSoilError(String(e)); });
+    return () => { cancelled = true; };
+  }, [showSoils, soils, soilError]);
 
   const styleFor = useMemo(() => {
     return (feature: FieldFeature): PathOptions => {
@@ -181,6 +207,7 @@ export default function FieldMap({
         map.remove();
         mapRef.current = null;
         layerRef.current = null;
+        soilLayerRef.current = null;
         tileRef.current = null;
         idToLayerRef.current.clear();
       };
@@ -234,6 +261,59 @@ export default function FieldMap({
       if (!map.hasLayer(tiles.streets)) tiles.streets.addTo(map);
     }
   }, [basemap]);
+
+  // Add or remove the soil overlay layer.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    let cancelled = false;
+
+    if (!showSoils || !soils) {
+      if (soilLayerRef.current) {
+        map.removeLayer(soilLayerRef.current);
+        soilLayerRef.current = null;
+      }
+      return;
+    }
+    if (soilLayerRef.current) return; // already present
+
+    (async () => {
+      const L = (await import('leaflet')).default;
+      if (cancelled || !mapRef.current) return;
+      const layer = L.geoJSON(soils as unknown as GeoJSON.GeoJsonObject, {
+        style: (feat) => {
+          const f = feat as unknown as SoilFeature;
+          return {
+            color: '#222',
+            weight: 0.5,
+            opacity: 0.6,
+            fillColor: soilColor(f.properties.hydrologicGroup),
+            fillOpacity: 0.55,
+          } as PathOptions;
+        },
+        onEachFeature: (feat, lyr) => {
+          const f = feat as unknown as SoilFeature;
+          const p = f.properties;
+          const lines = [
+            `<strong>${p.musym ?? '—'} · ${p.muname ?? 'Unnamed map unit'}</strong>`,
+            p.dominantComponent ? `Dominant: ${p.dominantComponent}` : null,
+            p.drainageClass ? `Drainage: ${p.drainageClass}` : null,
+            p.hydrologicGroup ? `Hydrologic group: ${p.hydrologicGroup}` : null,
+            `${formatAcres(p.acres)} ac in this field`,
+          ].filter(Boolean).join('<br/>');
+          lyr.bindTooltip(lines, { sticky: true, direction: 'top', opacity: 0.95 });
+        },
+      });
+      // Insert below the field outlines so the field stroke remains readable.
+      layer.addTo(mapRef.current!);
+      if (layerRef.current) layerRef.current.bringToFront();
+      soilLayerRef.current = layer;
+    })().catch(e => {
+      if (!cancelled) setSoilError(`Soil overlay failed: ${e}`);
+    });
+
+    return () => { cancelled = true; };
+  }, [showSoils, soils]);
 
   const selectedFeature = useMemo(() => {
     if (!data || selectedId == null) return null;
@@ -325,7 +405,16 @@ export default function FieldMap({
           >
             Fit
           </button>
+          <BasemapBtn
+            active={showSoils}
+            onClick={() => setShowSoils(v => !v)}
+            label={showSoils ? 'Soils ✓' : 'Soils'}
+            ariaLabel={showSoils ? 'Hide USDA soil overlay' : 'Show USDA soil overlay'}
+          />
         </div>
+        {showSoils && (
+          <SoilLegend loading={!soils && !soilError} error={soilError} meta={soils?.metadata} />
+        )}
         <div
           style={{
             position: 'absolute',
@@ -402,12 +491,23 @@ export default function FieldMap({
   );
 }
 
-function BasemapBtn({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+function BasemapBtn({
+  active,
+  onClick,
+  label,
+  ariaLabel,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  ariaLabel?: string;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={active}
+      aria-label={ariaLabel}
       style={{
         padding: '6px 10px',
         borderRadius: '6px',
@@ -421,5 +521,81 @@ function BasemapBtn({ active, onClick, label }: { active: boolean; onClick: () =
     >
       {label}
     </button>
+  );
+}
+
+function SoilLegend({
+  loading,
+  error,
+  meta,
+}: {
+  loading: boolean;
+  error: string | null;
+  meta: SoilFeatureCollection['metadata'];
+}) {
+  return (
+    <div
+      role="region"
+      aria-label="USDA SSURGO soil overlay legend"
+      style={{
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        zIndex: 500,
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        borderRadius: '8px',
+        padding: '8px 10px',
+        fontSize: '11px',
+        color: '#333',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+        maxWidth: '220px',
+      }}
+    >
+      <div style={{ fontWeight: 600, marginBottom: '4px', fontSize: '12px' }}>
+        Soil — USDA SSURGO
+      </div>
+      {loading && <div style={{ color: '#666' }}>Loading soil data…</div>}
+      {error && <div style={{ color: '#a33' }}>Could not load soils: {error}</div>}
+      {!loading && !error && (
+        <>
+          <div style={{ color: '#555', marginBottom: '6px' }}>
+            Colored by hydrologic group (runoff potential).
+          </div>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '3px' }}>
+            {Object.entries(HYDROLOGIC_GROUP_COLORS).map(([group, color]) => (
+              <li key={group} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '3px',
+                    backgroundColor: color,
+                    border: '1px solid rgba(0,0,0,0.2)',
+                  }}
+                />
+                <span><strong>{group}</strong> · {HYDROLOGIC_GROUP_DESC[group]}</span>
+              </li>
+            ))}
+          </ul>
+          <div style={{ color: '#777', marginTop: '6px', fontSize: '10px', lineHeight: 1.3 }}>
+            Source:{' '}
+            <a
+              href="https://websoilsurvey.nrcs.usda.gov/"
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: '#3F4F2C' }}
+            >
+              USDA NRCS Web Soil Survey (SSURGO)
+            </a>
+            {meta?.retrievedAt && (
+              <> · retrieved {meta.retrievedAt.slice(0, 10)}</>
+            )}
+            <br />
+            Survey lines are approximate; not a substitute for field sampling.
+          </div>
+        </>
+      )}
+    </div>
   );
 }

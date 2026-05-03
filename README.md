@@ -123,13 +123,53 @@ a dark background and remain interactive.
    and re-export the KML.
 3. Run `npm run map:build` and commit the result.
 
+## Soil overlay (USDA SSURGO)
+
+The Map tab has an optional **Soils** overlay layered on top of the
+field polygons. It draws SSURGO soil map units, colored by USDA
+hydrologic group (A → D, runoff potential). Selecting a block reveals
+that field's per-soil acreage and percent split in the details card.
+
+Data files (both static, generated):
+
+- `public/soils.geojson` — soil map unit polygons **clipped to field
+  boundaries**. Each feature carries the `mukey`, `musym`, `muname`,
+  dominant component name, drainage class, hydrologic group, and the
+  clipped acreage.
+- `public/soil-summary.json` — per-field soil composition (acres +
+  percent split) keyed by `fieldId`.
+
+**Source:** [USDA NRCS Soil Data Access (SDA)](https://sdmdataaccess.nrcs.usda.gov/)
+— SSURGO via the public REST endpoint
+`https://sdmdataaccess.nrcs.usda.gov/Tabular/post.rest`. No API key,
+no authentication, free for non-commercial and low-volume use.
+
+**Caveat:** SSURGO survey lines are approximate, generalized at
+roughly 1:24,000 scale, and are **not** a substitute for on-site soil
+sampling. Use them to inform conversations, not absolute decisions.
+
+### Refreshing soil data
+
+```bash
+npm install              # ensures polygon-clipping is available
+npm run soil:build       # fetches SSURGO for the field AOI, clips, writes JSON
+npm run soil:validate    # checks coverage, fieldId references, % sums
+```
+
+`soil:build` reads `public/fields.geojson` to derive the AOI bounding
+box, so re-run it whenever field boundaries change (i.e. after
+`npm run map:build`). Commit `public/soils.geojson` and
+`public/soil-summary.json` together.
+
 ## Scripts
 
 ```bash
-npm run dev        # local dev
-npm run build      # static export build
-npm run lint       # eslint
-npm run typecheck  # tsc --noEmit
-npm run map:build  # regenerate public/fields.geojson from the KML
-npm run map:validate # sanity-check public/fields.geojson
+npm run dev           # local dev
+npm run build         # static export build
+npm run lint          # eslint
+npm run typecheck     # tsc --noEmit
+npm run map:build     # regenerate public/fields.geojson from the KML
+npm run map:validate  # sanity-check public/fields.geojson
+npm run soil:build    # regenerate public/soils.geojson + soil-summary.json from USDA SDA
+npm run soil:validate # sanity-check the soil files
 ```

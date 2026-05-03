@@ -1,0 +1,1493 @@
+{
+  "metadata": {
+    "source": "USDA NRCS Soil Data Access (SDA) — SSURGO",
+    "sourceUrl": "https://sdmdataaccess.nrcs.usda.gov/Tabular/post.rest",
+    "retrievedAt": "2026-05-03T20:52:09.833Z",
+    "method": "SDA_Get_Mukey_from_intersection_with_WktWgs84 + SDA_Get_Mupolygonkey_from_intersection_with_WktWgs84; clipped to field polygons via polygon-clipping (Greiner-Hormann)",
+    "aoiBbox": [
+      -120.78271166048839,
+      37.3586295202637,
+      -120.56633207628511,
+      37.48158237622651
+    ],
+    "caveat": "Soil survey lines are approximate and not a substitute for on-site sampling.",
+    "fieldCount": 45,
+    "mapUnitCount": 96
+  },
+  "fields": [
+    {
+      "fieldId": 1,
+      "block": "Johnston Block 1",
+      "ranch": "Johnston",
+      "reportedAcres": 33,
+      "polygonAcres": 33.56,
+      "soilCoverageAcres": 33.56,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 33.562,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 2,
+      "block": "Johnston Block 2",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 20.9,
+      "soilCoverageAcres": 20.9,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 13.98,
+          "percent": 66.9
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 6.918,
+          "percent": 33.1
+        }
+      ]
+    },
+    {
+      "fieldId": 3,
+      "block": "Johnston Block 3A",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 20.79,
+      "soilCoverageAcres": 20.79,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 16.952,
+          "percent": 81.5
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 3.842,
+          "percent": 18.5
+        }
+      ]
+    },
+    {
+      "fieldId": 4,
+      "block": "Johnston Block 3B",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 15.72,
+      "soilCoverageAcres": 15.72,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 15.724,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 5,
+      "block": "Johnston Block 4",
+      "ranch": "Johnston",
+      "reportedAcres": 13,
+      "polygonAcres": 12.5,
+      "soilCoverageAcres": 12.5,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 11.412,
+          "percent": 91.3
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 1.089,
+          "percent": 8.7
+        }
+      ]
+    },
+    {
+      "fieldId": 6,
+      "block": "Johnston Block 5A",
+      "ranch": "Johnston",
+      "reportedAcres": 15,
+      "polygonAcres": 11.84,
+      "soilCoverageAcres": 11.84,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 11.845,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 7,
+      "block": "Johnston Block 5B",
+      "ranch": "Johnston",
+      "reportedAcres": 15,
+      "polygonAcres": 13.75,
+      "soilCoverageAcres": 13.75,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 10.088,
+          "percent": 73.4
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 3.659,
+          "percent": 26.6
+        }
+      ]
+    },
+    {
+      "fieldId": 8,
+      "block": "Johnston Block 56/58",
+      "ranch": "Johnston",
+      "reportedAcres": 30,
+      "polygonAcres": 30.82,
+      "soilCoverageAcres": 30.82,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 20.52,
+          "percent": 66.6
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 10.3,
+          "percent": 33.4
+        }
+      ]
+    },
+    {
+      "fieldId": 9,
+      "block": "Johnston Block 36A",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 19.53,
+      "soilCoverageAcres": 19.53,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 19.015,
+          "percent": 97.4
+        },
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 0.51,
+          "percent": 2.6
+        }
+      ]
+    },
+    {
+      "fieldId": 10,
+      "block": "Johnston Block 36B",
+      "ranch": "Johnston",
+      "reportedAcres": 18.5,
+      "polygonAcres": 17.44,
+      "soilCoverageAcres": 17.44,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 17.357,
+          "percent": 99.5
+        },
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 0.08,
+          "percent": 0.5
+        }
+      ]
+    },
+    {
+      "fieldId": 11,
+      "block": "Johnston Block 39",
+      "ranch": "Johnston",
+      "reportedAcres": 17,
+      "polygonAcres": 16.37,
+      "soilCoverageAcres": 16.37,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 16.37,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 12,
+      "block": "Johnston Block 40",
+      "ranch": "Johnston",
+      "reportedAcres": 21,
+      "polygonAcres": 19.59,
+      "soilCoverageAcres": 19.59,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 19.593,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 13,
+      "block": "Johnston Block 35",
+      "ranch": "Johnston",
+      "reportedAcres": 17,
+      "polygonAcres": 16.08,
+      "soilCoverageAcres": 16.08,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 16.083,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 14,
+      "block": "Blue Lupin Block 17",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 21,
+      "polygonAcres": 20.73,
+      "soilCoverageAcres": 20.73,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 13.884,
+          "percent": 67
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 6.851,
+          "percent": 33
+        }
+      ]
+    },
+    {
+      "fieldId": 15,
+      "block": "Blue Lupin Block 18",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 19,
+      "polygonAcres": 19.68,
+      "soilCoverageAcres": 19.68,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 12.198,
+          "percent": 62
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 7.281,
+          "percent": 37
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 0.195,
+          "percent": 1
+        },
+        {
+          "mukey": "463192",
+          "musym": "W",
+          "muname": "Water",
+          "dominantComponent": "Water",
+          "drainageClass": null,
+          "hydrologicGroup": "D",
+          "taxOrder": null,
+          "acres": 0.005,
+          "percent": 0
+        }
+      ]
+    },
+    {
+      "fieldId": 16,
+      "block": "Blue Lupin Block 19",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 35,
+      "polygonAcres": 34.2,
+      "soilCoverageAcres": 34.2,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 25.243,
+          "percent": 73.8
+        },
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 8.349,
+          "percent": 24.4
+        },
+        {
+          "mukey": "463192",
+          "musym": "W",
+          "muname": "Water",
+          "dominantComponent": "Water",
+          "drainageClass": null,
+          "hydrologicGroup": "D",
+          "taxOrder": null,
+          "acres": 0.609,
+          "percent": 1.8
+        }
+      ]
+    },
+    {
+      "fieldId": 17,
+      "block": "Blue Lupin Block 21",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 23.5,
+      "polygonAcres": 23.68,
+      "soilCoverageAcres": 23.68,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 21.89,
+          "percent": 92.5
+        },
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 1.597,
+          "percent": 6.7
+        },
+        {
+          "mukey": "463192",
+          "musym": "W",
+          "muname": "Water",
+          "dominantComponent": "Water",
+          "drainageClass": null,
+          "hydrologicGroup": "D",
+          "taxOrder": null,
+          "acres": 0.189,
+          "percent": 0.8
+        }
+      ]
+    },
+    {
+      "fieldId": 18,
+      "block": "Blue Lupin Block 10",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 30,
+      "polygonAcres": 28.69,
+      "soilCoverageAcres": 28.69,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 28.695,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 19,
+      "block": "Blue Lupin Block 8/9",
+      "ranch": "Blue Lupin",
+      "reportedAcres": 38.5,
+      "polygonAcres": 38.08,
+      "soilCoverageAcres": 38.08,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 32.382,
+          "percent": 85
+        },
+        {
+          "mukey": "463004",
+          "musym": "DgA",
+          "muname": "Delhi sand, silty substratum, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 5.695,
+          "percent": 15
+        }
+      ]
+    },
+    {
+      "fieldId": 20,
+      "block": "Fagundes Block 64A",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 18.88,
+      "soilCoverageAcres": 18.88,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 18.88,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 21,
+      "block": "Fagundes Block 64B",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 19.62,
+      "soilCoverageAcres": 19.62,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 19.619,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 22,
+      "block": "Fagundes Block 65B",
+      "ranch": "Fagundes",
+      "reportedAcres": 14,
+      "polygonAcres": 12.97,
+      "soilCoverageAcres": 12.97,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 12.965,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 23,
+      "block": "Fagundes Block 65A",
+      "ranch": "Fagundes",
+      "reportedAcres": 13,
+      "polygonAcres": 13.08,
+      "soilCoverageAcres": 13.08,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 13.076,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 24,
+      "block": "Fagundes Block 67A",
+      "ranch": "Fagundes",
+      "reportedAcres": 18,
+      "polygonAcres": 17.38,
+      "soilCoverageAcres": 17.38,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 15.441,
+          "percent": 88.8
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 1.545,
+          "percent": 8.9
+        },
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 0.395,
+          "percent": 2.3
+        }
+      ]
+    },
+    {
+      "fieldId": 25,
+      "block": "Fagundes Block 67B",
+      "ranch": "Fagundes",
+      "reportedAcres": 15,
+      "polygonAcres": 15.32,
+      "soilCoverageAcres": 15.32,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "462962",
+          "musym": "AgB",
+          "muname": "Atwater loamy sand, deep over hardpan, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 5.049,
+          "percent": 33
+        },
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 5.049,
+          "percent": 33
+        },
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 3.902,
+          "percent": 25.5
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 1.315,
+          "percent": 8.6
+        }
+      ]
+    },
+    {
+      "fieldId": 26,
+      "block": "Fagundes Block 70A",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 21.46,
+      "soilCoverageAcres": 21.46,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 11.796,
+          "percent": 55
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 9.664,
+          "percent": 45
+        }
+      ]
+    },
+    {
+      "fieldId": 27,
+      "block": "Fagundes Block 70B",
+      "ranch": "Fagundes",
+      "reportedAcres": 19,
+      "polygonAcres": 16.39,
+      "soilCoverageAcres": 16.39,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 16.152,
+          "percent": 98.5
+        },
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 0.24,
+          "percent": 1.5
+        }
+      ]
+    },
+    {
+      "fieldId": 28,
+      "block": "Fagundes Block 71",
+      "ranch": "Fagundes",
+      "reportedAcres": 9,
+      "polygonAcres": 9.45,
+      "soilCoverageAcres": 9.45,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 5.875,
+          "percent": 62.2
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 3.57,
+          "percent": 37.8
+        }
+      ]
+    },
+    {
+      "fieldId": 29,
+      "block": "Fagundes Block 72A",
+      "ranch": "Fagundes",
+      "reportedAcres": 16,
+      "polygonAcres": 17.59,
+      "soilCoverageAcres": 17.59,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 8.406,
+          "percent": 47.8
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 7.245,
+          "percent": 41.2
+        },
+        {
+          "mukey": "462962",
+          "musym": "AgB",
+          "muname": "Atwater loamy sand, deep over hardpan, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 1.214,
+          "percent": 6.9
+        },
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 0.728,
+          "percent": 4.1
+        }
+      ]
+    },
+    {
+      "fieldId": 30,
+      "block": "Fagundes Block 72B",
+      "ranch": "Fagundes",
+      "reportedAcres": 11,
+      "polygonAcres": 9.55,
+      "soilCoverageAcres": 9.55,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 7.248,
+          "percent": 75.9
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 2.301,
+          "percent": 24.1
+        }
+      ]
+    },
+    {
+      "fieldId": 31,
+      "block": "Fagundes Block 73",
+      "ranch": "Fagundes",
+      "reportedAcres": 19,
+      "polygonAcres": 18.75,
+      "soilCoverageAcres": 18.75,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 18.352,
+          "percent": 97.9
+        },
+        {
+          "mukey": "462962",
+          "musym": "AgB",
+          "muname": "Atwater loamy sand, deep over hardpan, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 0.401,
+          "percent": 2.1
+        }
+      ]
+    },
+    {
+      "fieldId": 32,
+      "block": "Fagundes Block 74A",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 20.07,
+      "soilCoverageAcres": 20.07,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 19.979,
+          "percent": 99.5
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 0.094,
+          "percent": 0.5
+        }
+      ]
+    },
+    {
+      "fieldId": 33,
+      "block": "Fagundes Block 74B",
+      "ranch": "Fagundes",
+      "reportedAcres": 22,
+      "polygonAcres": 22.56,
+      "soilCoverageAcres": 22.56,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 22.561,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 34,
+      "block": "Fagundes Block 76A",
+      "ranch": "Fagundes",
+      "reportedAcres": 10,
+      "polygonAcres": 11.42,
+      "soilCoverageAcres": 11.42,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 11.418,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 35,
+      "block": "Fagundes Block 76B",
+      "ranch": "Fagundes",
+      "reportedAcres": 20,
+      "polygonAcres": 19.86,
+      "soilCoverageAcres": 19.86,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 18.949,
+          "percent": 95.4
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 0.914,
+          "percent": 4.6
+        }
+      ]
+    },
+    {
+      "fieldId": 36,
+      "block": "Fagundes Block 66",
+      "ranch": "Fagundes",
+      "reportedAcres": 27,
+      "polygonAcres": 26.91,
+      "soilCoverageAcres": 26.91,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 21.991,
+          "percent": 81.7
+        },
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 4.92,
+          "percent": 18.3
+        }
+      ]
+    },
+    {
+      "fieldId": 37,
+      "block": "Fagundes Block 68",
+      "ranch": "Fagundes",
+      "reportedAcres": 35,
+      "polygonAcres": 34.28,
+      "soilCoverageAcres": 34.28,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 34.279,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 38,
+      "block": "Fagundes Block 75",
+      "ranch": "Fagundes",
+      "reportedAcres": 26,
+      "polygonAcres": 25.31,
+      "soilCoverageAcres": 25.31,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 25.309,
+          "percent": 100
+        }
+      ]
+    },
+    {
+      "fieldId": 39,
+      "block": "Fagundes Block 77",
+      "ranch": "Fagundes",
+      "reportedAcres": 26,
+      "polygonAcres": 26.37,
+      "soilCoverageAcres": 26.37,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 26.363,
+          "percent": 100
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 0.003,
+          "percent": 0
+        }
+      ]
+    },
+    {
+      "fieldId": 40,
+      "block": "Fagundes Block 61",
+      "ranch": "Fagundes",
+      "reportedAcres": 17,
+      "polygonAcres": 16.58,
+      "soilCoverageAcres": 16.58,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 8.407,
+          "percent": 50.7
+        },
+        {
+          "mukey": "462962",
+          "musym": "AgB",
+          "muname": "Atwater loamy sand, deep over hardpan, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 6.82,
+          "percent": 41.1
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 1.353,
+          "percent": 8.2
+        }
+      ]
+    },
+    {
+      "fieldId": 41,
+      "block": "Fagundes Block 62",
+      "ranch": "Fagundes",
+      "reportedAcres": 27,
+      "polygonAcres": 26.49,
+      "soilCoverageAcres": 26.49,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 15.541,
+          "percent": 58.7
+        },
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 7.5,
+          "percent": 28.3
+        },
+        {
+          "mukey": "462962",
+          "musym": "AgB",
+          "muname": "Atwater loamy sand, deep over hardpan, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 3.453,
+          "percent": 13
+        }
+      ]
+    },
+    {
+      "fieldId": 42,
+      "block": "Fagundes Block 63",
+      "ranch": "Fagundes",
+      "reportedAcres": 32,
+      "polygonAcres": 31.14,
+      "soilCoverageAcres": 31.14,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 21.529,
+          "percent": 69.1
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 5.206,
+          "percent": 16.7
+        },
+        {
+          "mukey": "462964",
+          "musym": "AnA",
+          "muname": "Atwater sand, 0 to 3 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 4.166,
+          "percent": 13.4
+        },
+        {
+          "mukey": "462965",
+          "musym": "AnB",
+          "muname": "Atwater sand, 3 to 8 percent slopes",
+          "dominantComponent": "Atwater",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Alfisols",
+          "acres": 0.241,
+          "percent": 0.8
+        }
+      ]
+    },
+    {
+      "fieldId": 43,
+      "block": "Fagundes Block 60",
+      "ranch": "Fagundes",
+      "reportedAcres": 28,
+      "polygonAcres": 27.59,
+      "soilCoverageAcres": 27.59,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "2766105",
+          "musym": "DfB",
+          "muname": "Delhi sand, 3 to 8 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 17.096,
+          "percent": 62
+        },
+        {
+          "mukey": "2766108",
+          "musym": "DfA",
+          "muname": "Delhi sand, 0 to 3 percent slopes",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 10.494,
+          "percent": 38
+        }
+      ]
+    },
+    {
+      "fieldId": 44,
+      "block": "Fagundes Mello",
+      "ranch": "Mello",
+      "reportedAcres": 35,
+      "polygonAcres": 35.21,
+      "soilCoverageAcres": 35.21,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "463167",
+          "musym": "SnA",
+          "muname": "Snelling sandy loam, 0 to 3 percent slopes",
+          "dominantComponent": "Snelling",
+          "drainageClass": "Well drained",
+          "hydrologicGroup": "C",
+          "taxOrder": "Alfisols",
+          "acres": 35.178,
+          "percent": 99.9
+        },
+        {
+          "mukey": "2766115",
+          "musym": "DdA",
+          "muname": "Delhi loamy sand, 0 to 3 percent slopes, MLRA 17",
+          "dominantComponent": "Delhi",
+          "drainageClass": "Somewhat excessively drained",
+          "hydrologicGroup": "A",
+          "taxOrder": "Entisols",
+          "acres": 0.028,
+          "percent": 0.1
+        }
+      ]
+    },
+    {
+      "fieldId": 45,
+      "block": "Fagundes Angel Ranch",
+      "ranch": "Angel Ranch",
+      "reportedAcres": 17,
+      "polygonAcres": 19.29,
+      "soilCoverageAcres": 19.29,
+      "coveragePct": 100,
+      "components": [
+        {
+          "mukey": "3251995",
+          "musym": "ScB",
+          "muname": "San Joaquin sandy loam, 3 to 8 percent slopes",
+          "dominantComponent": "San Joaquin",
+          "drainageClass": "Moderately well drained",
+          "hydrologicGroup": "D",
+          "taxOrder": "Alfisols",
+          "acres": 13.615,
+          "percent": 70.6
+        },
+        {
+          "mukey": "463156",
+          "musym": "ScA",
+          "muname": "San Joaquin sandy loam, 0 to 3 percent slopes",
+          "dominantComponent": "San Joaquin",
+          "drainageClass": "Moderately well drained",
+          "hydrologicGroup": "D",
+          "taxOrder": "Alfisols",
+          "acres": 5.156,
+          "percent": 26.7
+        },
+        {
+          "mukey": "3251999",
+          "musym": "AaA",
+          "muname": "Alamo clay, 0 to 1 percent slopes",
+          "dominantComponent": "Alamo",
+          "drainageClass": "Poorly drained",
+          "hydrologicGroup": "D",
+          "taxOrder": "Mollisols",
+          "acres": 0.523,
+          "percent": 2.7
+        }
+      ]
+    }
+  ]
+}

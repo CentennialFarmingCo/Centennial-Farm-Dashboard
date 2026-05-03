@@ -1,11 +1,23 @@
 'use client';
 
 import { useState, useId } from "react";
-import { Sprout, MapPin, Sun, Cloud, FileText, Printer } from "lucide-react";
-import { FIELDS_DATA } from "./fields.js";
+import { Sprout, MapPin, Sun, Cloud, FileText, Printer, AlertTriangle } from "lucide-react";
+import {
+  FIELDS,
+  totalFields,
+  totalAcres,
+  formatAcres,
+  ranches,
+  crops,
+  varieties,
+  largestBlocks,
+  dataWarnings,
+} from "./stats";
+import BlockExplorer from "./BlockExplorer";
+import Weather from "./Weather";
 
 export default function App() {
-  const [tab, setTab] = useState("blocks");
+  const [tab, setTab] = useState("today");
   const tablistId = useId();
 
   const tabs = [
@@ -16,11 +28,11 @@ export default function App() {
     { id: "report", label: "PDF Report", icon: FileText },
   ];
 
-  const totalFields = FIELDS_DATA.length;
-  const totalAcres = FIELDS_DATA.reduce((sum, f) => sum + f.acres, 0);
-  const totalAcresLabel = Number.isInteger(totalAcres)
-    ? totalAcres.toString()
-    : totalAcres.toFixed(1);
+  const totalAcresLabel = formatAcres(totalAcres);
+  const topVariety = varieties[0];
+  const topRanch = ranches[0];
+  const peachAcres = crops.filter(c => c.name.includes('Peach')).reduce((s, c) => s + c.acres, 0);
+  const almondAcres = crops.find(c => c.name === 'Almond')?.acres ?? 0;
 
   return (
     <div
@@ -32,7 +44,6 @@ export default function App() {
         flexDirection: 'column',
       }}
     >
-      {/* STICKY WRAPPER — header + tabs share one sticky container so they cannot overlap */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50 }}>
         <header
           style={{
@@ -76,6 +87,7 @@ export default function App() {
                   aria-selected={active}
                   aria-controls={`${tablistId}-panel-${t.id}`}
                   tabIndex={active ? 0 : -1}
+                  data-testid={`tab-${t.id}`}
                   onClick={() => setTab(t.id)}
                   style={{
                     flex: 1,
@@ -102,8 +114,100 @@ export default function App() {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
       <main style={{ padding: '24px', maxWidth: '1280px', margin: '0 auto', width: '100%', flex: 1 }}>
+        <section
+          role="tabpanel"
+          id={`${tablistId}-panel-today`}
+          aria-labelledby={`${tablistId}-tab-today`}
+          hidden={tab !== "today"}
+        >
+          {tab === "today" && (
+            <div style={{ display: 'grid', gap: '16px' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '12px',
+                }}
+                data-testid="kpi-grid"
+              >
+                <Kpi label="Total Blocks" value={String(totalFields)} accent="#C55A2E" />
+                <Kpi label="Total Acres" value={totalAcresLabel} accent="#3B7A57" />
+                <Kpi label="Ranches" value={String(ranches.length)} accent="#B8860B" />
+                <Kpi label="Crops" value={String(crops.length)} accent="#6B4E9B" />
+                <Kpi label="Varieties" value={String(varieties.length)} accent="#2E86AB" />
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: '16px',
+                }}
+              >
+                <Panel title="Acres by Crop" testId="acres-by-crop">
+                  <BarList items={crops.map(c => ({ name: c.name, value: c.acres, sub: `${c.blocks} blocks` }))} />
+                </Panel>
+                <Panel title="Acres by Ranch" testId="acres-by-ranch">
+                  <BarList items={ranches.map(r => ({ name: r.name, value: r.acres, sub: `${r.blocks} blocks` }))} />
+                </Panel>
+                <Panel title="Top Varieties (by acres)" testId="top-varieties">
+                  <BarList items={varieties.slice(0, 6).map(v => ({ name: v.name, value: v.acres, sub: `${v.blocks} blocks` }))} />
+                </Panel>
+                <Panel title="Largest Blocks" testId="largest-blocks">
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px' }}>
+                    {largestBlocks.map(b => (
+                      <li
+                        key={b.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: '8px 12px',
+                          backgroundColor: '#F4EEE0',
+                          borderRadius: '10px',
+                        }}
+                      >
+                        <span>
+                          <strong>{b.block}</strong>
+                          <span style={{ color: '#666', fontSize: '12px', display: 'block' }}>
+                            {b.crop} &middot; {b.variety}
+                          </span>
+                        </span>
+                        <span style={{ fontWeight: 700, color: '#C55A2E' }}>{formatAcres(b.acres)} ac</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Panel>
+              </div>
+
+              <Panel title="Quick Summary" testId="quick-summary">
+                <p style={{ lineHeight: 1.6, color: '#444' }}>
+                  {totalFields} blocks across {ranches.length} ranches totalling
+                  {' '}<strong>{totalAcresLabel} acres</strong>. The largest single block is
+                  {' '}<strong>{largestBlocks[0].block}</strong> at {formatAcres(largestBlocks[0].acres)} acres.
+                  {' '}Peach plantings cover {formatAcres(peachAcres)} acres
+                  {' '}and almonds cover {formatAcres(almondAcres)} acres.
+                  {topVariety ? <> Most-planted variety: <strong>{topVariety.name}</strong> ({formatAcres(topVariety.acres)} ac).</> : null}
+                  {topRanch ? <> Largest ranch by acreage: <strong>{topRanch.name}</strong> ({formatAcres(topRanch.acres)} ac).</> : null}
+                </p>
+              </Panel>
+
+              {dataWarnings.length > 0 && (
+                <Panel title="Data Quality" testId="data-warnings">
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '6px' }}>
+                    {dataWarnings.map(w => (
+                      <li key={`${w.id}-${w.message}`} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#7a5b1a' }}>
+                        <AlertTriangle style={{ width: '16px', height: '16px' }} aria-hidden="true" />
+                        <span><strong>{w.block}:</strong> {w.message}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Panel>
+              )}
+            </div>
+          )}
+        </section>
+
         <section
           role="tabpanel"
           id={`${tablistId}-panel-blocks`}
@@ -113,10 +217,10 @@ export default function App() {
           {tab === "blocks" && (
             <div>
               <h2 style={{ fontSize: '24px', fontWeight: 600, marginBottom: '24px' }}>
-                All Blocks ({totalFields} total)
+                All Blocks ({totalFields} total &middot; {totalAcresLabel} acres)
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-                {FIELDS_DATA.map(field => (
+                {FIELDS.map(field => (
                   <div
                     key={field.id}
                     style={{
@@ -133,7 +237,7 @@ export default function App() {
                         <p style={{ color: '#666', marginTop: '4px' }}>{field.ranch} &bull; {field.variety}</p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <p style={{ fontSize: '36px', fontWeight: 700, color: '#C55A2E', lineHeight: 1 }}>{field.acres}</p>
+                        <p style={{ fontSize: '36px', fontWeight: 700, color: '#C55A2E', lineHeight: 1 }}>{formatAcres(field.acres)}</p>
                         <p style={{ fontSize: '12px', textTransform: 'uppercase', color: '#4ade80' }}>acres</p>
                         <p style={{ fontSize: '13px', color: '#888', marginTop: '8px' }}>{field.crop}</p>
                       </div>
@@ -147,46 +251,11 @@ export default function App() {
 
         <section
           role="tabpanel"
-          id={`${tablistId}-panel-today`}
-          aria-labelledby={`${tablistId}-tab-today`}
-          hidden={tab !== "today"}
-        >
-          {tab === "today" && (
-            <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 600, marginBottom: '24px' }}>
-                Today&rsquo;s Snapshot
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
-                  <p style={{ color: '#555' }}>Pit Hardening Window</p>
-                  <p style={{ fontSize: '36px', fontWeight: 700, color: '#C55A2E' }}>42 days</p>
-                </div>
-                <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
-                  <p style={{ color: '#555' }}>High Priority Tasks</p>
-                  <p style={{ fontSize: '36px', fontWeight: 700, color: '#f97316' }}>7</p>
-                </div>
-                <div style={{ backgroundColor: '#F4EEE0', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
-                  <p style={{ color: '#555' }}>Total Acres</p>
-                  <p style={{ fontSize: '36px', fontWeight: 700, color: '#4ade80' }}>{totalAcresLabel}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
-
-        <section
-          role="tabpanel"
           id={`${tablistId}-panel-map`}
           aria-labelledby={`${tablistId}-tab-map`}
           hidden={tab !== "map"}
         >
-          {tab === "map" && (
-            <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '40px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 600, marginBottom: '16px' }}>Interactive Farm Map</h2>
-              <p style={{ color: '#555', marginBottom: '8px' }}>{totalFields} shaded polygons from your KML</p>
-              <p style={{ color: '#888' }}>Full clickable version with zoom coming next</p>
-            </div>
-          )}
+          {tab === "map" && <BlockExplorer />}
         </section>
 
         <section
@@ -195,12 +264,7 @@ export default function App() {
           aria-labelledby={`${tablistId}-tab-weather`}
           hidden={tab !== "weather"}
         >
-          {tab === "weather" && (
-            <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '40px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 600, marginBottom: '16px' }}>Weather &amp; Irrigation Alerts</h2>
-              <p style={{ color: '#555' }}>Real-time conditions + RDI recommendations coming next</p>
-            </div>
-          )}
+          {tab === "weather" && <Weather />}
         </section>
 
         <section
@@ -214,6 +278,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => window.print()}
+                data-testid="print-report"
                 style={{
                   backgroundColor: '#C55A2E',
                   color: 'white',
@@ -253,5 +318,71 @@ export default function App() {
         Centennial Farming Company &bull; {totalFields} fields &bull; {totalAcresLabel} acres &bull; 2026 Season
       </footer>
     </div>
+  );
+}
+
+function Kpi({ label, value, accent }: { label: string; value: string; accent: string }) {
+  return (
+    <div
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '20px',
+        padding: '20px',
+        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.08)',
+        textAlign: 'center',
+      }}
+    >
+      <p style={{ fontSize: '12px', textTransform: 'uppercase', color: '#888', letterSpacing: '0.05em' }}>{label}</p>
+      <p style={{ fontSize: '32px', fontWeight: 700, color: accent, lineHeight: 1.1 }}>{value}</p>
+    </div>
+  );
+}
+
+function Panel({ title, children, testId }: { title: string; children: React.ReactNode; testId?: string }) {
+  return (
+    <div
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '24px',
+        padding: '20px',
+        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+      }}
+      data-testid={testId}
+    >
+      <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '14px', color: '#333' }}>{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function BarList({ items }: { items: { name: string; value: number; sub?: string }[] }) {
+  const max = Math.max(...items.map(i => i.value), 1);
+  return (
+    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '10px' }}>
+      {items.map(item => {
+        const pct = Math.round((item.value / max) * 100);
+        return (
+          <li key={item.name}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
+              <span>
+                <strong>{item.name}</strong>
+                {item.sub ? <span style={{ color: '#888' }}> &middot; {item.sub}</span> : null}
+              </span>
+              <span style={{ fontWeight: 600, color: '#C55A2E' }}>{formatAcres(item.value)} ac</span>
+            </div>
+            <div style={{ backgroundColor: '#F4EEE0', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  width: `${pct}%`,
+                  height: '100%',
+                  backgroundColor: '#C55A2E',
+                  borderRadius: '999px',
+                }}
+              />
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

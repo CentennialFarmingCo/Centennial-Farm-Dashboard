@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FIELDS, formatAcres, type Field } from "./stats";
+import FieldMap from "./FieldMap";
 
 const RANCH_COLORS: Record<string, string> = {
   Johnston: '#C55A2E',
@@ -59,6 +60,7 @@ export default function BlockExplorer() {
   const filteredAcres = filtered.reduce((s, f) => s + f.acres, 0);
   const maxAcres = Math.max(...FIELDS.map(f => f.acres), 1);
   const selected = selectedId != null ? FIELDS.find(f => f.id === selectedId) ?? null : null;
+  const filteredIds = useMemo(() => new Set(filtered.map(f => f.id)), [filtered]);
 
   const selectStyle: React.CSSProperties = {
     padding: '8px 12px',
@@ -72,18 +74,19 @@ export default function BlockExplorer() {
     <div style={{ display: 'grid', gap: '16px' }}>
       <div
         style={{
-          backgroundColor: '#FFF7E6',
-          border: '1px solid #f5d493',
+          backgroundColor: '#EAF5EE',
+          border: '1px solid #b6dac3',
           borderRadius: '12px',
           padding: '12px 16px',
           fontSize: '13px',
-          color: '#7a5b1a',
+          color: '#2e5d3d',
         }}
         data-testid="map-note"
       >
-        <strong>Note:</strong> True field boundary polygons are not yet loaded.
-        This explorer lets you browse blocks proportionally by acreage. To enable
-        a true geographic map, drop a KML or GeoJSON file in <code>app/</code> and we can wire it up.
+        <strong>Field boundaries from Google Earth.</strong> The map below shows
+        each block&rsquo;s real footprint, drawn from{' '}
+        <code>public/Farming-Field-Map.kml</code>. The tile grid underneath is
+        sized by acreage for quick comparison.
       </div>
 
       <div
@@ -165,6 +168,14 @@ export default function BlockExplorer() {
           &middot; <strong>{formatAcres(filteredAcres)}</strong> acres
         </div>
       </div>
+
+      <FieldMap
+        filteredIds={filteredIds}
+        selectedId={selectedId}
+        onSelect={(id) => setSelectedId(prev => (prev === id ? null : id))}
+        ranchColor={ranchColor}
+        cropBg={cropBg}
+      />
 
       <div
         style={{

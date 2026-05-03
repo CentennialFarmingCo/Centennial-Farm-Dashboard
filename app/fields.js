@@ -5,7 +5,7 @@ export const FIELDS_DATA = [
   {"id":4,"block":"Johnston Block 3B","ranch":"Johnston","variety":"Angelus","crop":"Freestone Peach","acres":18.5},
   {"id":5,"block":"Johnston Block 4","ranch":"Johnston","variety":"Parade","crop":"Freestone Peach","acres":13},
   {"id":6,"block":"Johnston Block 5A","ranch":"Johnston","variety":"Tra Zee","crop":"Freestone Peach","acres":15},
-  {"id":7,"block":"Johnston block 5B","ranch":"Johnston","variety":"Angelus","crop":"Freestone Peach","acres":15},
+  {"id":7,"block":"Johnston Block 5B","ranch":"Johnston","variety":"Angelus","crop":"Freestone Peach","acres":15},
   {"id":8,"block":"Johnston Block 56/58","ranch":"Johnston","variety":"Autumn Flame","crop":"Freestone Peach","acres":30},
   {"id":9,"block":"Johnston Block 36A","ranch":"Johnston","variety":"Carnival","crop":"Freestone Peach","acres":18.5},
   {"id":10,"block":"Johnston Block 36B","ranch":"Johnston","variety":"Kaweah","crop":"Freestone Peach","acres":18.5},
@@ -45,5 +45,3 @@ export const FIELDS_DATA = [
   {"id":44,"block":"Fagundes Mello","ranch":"Mello","variety":"Independence","crop":"Almond","acres":35},
   {"id":45,"block":"Fagundes Angel Ranch","ranch":"Angel Ranch","variety":"Nonpareil/Monterey/Carmel","crop":"Almond","acres":17}
 ];
-
-export default FIELDS_DATA;

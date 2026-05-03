@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON, LatLngBounds, Layer, PathOptions, TileLayer as LeafletTileLayer, Path, Polygon } from "leaflet";
 import { formatAcres } from "./stats";
 
 type FieldFeature = {
@@ -41,9 +42,7 @@ type Props = {
   cropBg: (crop: string) => string;
 };
 
-const VIEW_W = 800;
-const VIEW_H = 560;
-const PAD = 24;
+type Basemap = 'satellite' | 'streets';
 
 export default function FieldMap({
   filteredIds,
@@ -54,14 +53,30 @@ export default function FieldMap({
 }: Props) {
   const [data, setData] = useState<FieldsCollection | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [hoverId, setHoverId] = useState<number | null>(null);
-  const [view, setView] = useState({ scale: 1, tx: 0, ty: 0 });
-  const svgRef = useRef<SVGSVGElement | null>(null);
-  const dragRef = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null);
+  const [basemap, setBasemap] = useState<Basemap>('satellite');
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const layerRef = useRef<LeafletGeoJSON | null>(null);
+  const tileRef = useRef<{ satellite: LeafletTileLayer; streets: LeafletTileLayer } | null>(null);
+  const boundsRef = useRef<LatLngBounds | null>(null);
+  const idToLayerRef = useRef<globalThis.Map<number, Layer>>(new globalThis.Map());
+
+  // Load Leaflet CSS once on the client. Loading via JS keeps the static export
+  // self-contained without a hard build-time CSS import in layout.tsx.
+  useEffect(() => {
+    const id = 'leaflet-css';
+    if (document.getElementById(id)) return;
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+    link.crossOrigin = '';
+    document.head.appendChild(link);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
-    // Use basePath-aware URL: relative to current page so it works under any deploy path.
     fetch('fields.geojson')
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -72,236 +87,301 @@ export default function FieldMap({
     return () => { cancelled = true; };
   }, []);
 
-  const projected = useMemo(() => {
-    if (!data) return null;
-    let minLon = Infinity, maxLon = -Infinity, minLat = Infinity, maxLat = -Infinity;
-    for (const f of data.features) {
-      for (const ring of f.geometry.coordinates) {
-        for (const [lon, lat] of ring) {
-          if (lon < minLon) minLon = lon;
-          if (lon > maxLon) maxLon = lon;
-          if (lat < minLat) minLat = lat;
-          if (lat > maxLat) maxLat = lat;
-        }
-      }
-    }
-    // Equirectangular projection with mid-lat scaling — accurate enough at sub-km extents.
-    const midLat = (minLat + maxLat) / 2;
-    const lonScale = Math.cos((midLat * Math.PI) / 180);
-    const projLon = (lon: number) => (lon - minLon) * lonScale;
-    const projLat = (lat: number) => (maxLat - lat); // flip Y so north is up
-    const wx = (maxLon - minLon) * lonScale;
-    const hy = (maxLat - minLat);
-    const scale = Math.min(
-      (VIEW_W - PAD * 2) / wx,
-      (VIEW_H - PAD * 2) / hy,
-    );
-    const offsetX = (VIEW_W - wx * scale) / 2;
-    const offsetY = (VIEW_H - hy * scale) / 2;
-    const toXY = (lon: number, lat: number) => [
-      projLon(lon) * scale + offsetX,
-      projLat(lat) * scale + offsetY,
-    ] as const;
-
-    const polys = data.features.map(f => {
-      const id = f.properties.fieldId;
-      const ring = f.geometry.coordinates[0] ?? [];
-      const path = ring
-        .map(([lon, lat], i) => {
-          const [x, y] = toXY(lon, lat);
-          return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
-        })
-        .join(' ') + ' Z';
-      // Centroid for label placement.
-      let cx = 0, cy = 0;
-      for (const [lon, lat] of ring.slice(0, -1)) { // last point repeats first
-        const [x, y] = toXY(lon, lat);
-        cx += x; cy += y;
-      }
-      const n = Math.max(ring.length - 1, 1);
-      cx /= n; cy /= n;
+  const styleFor = useMemo(() => {
+    return (feature: FieldFeature): PathOptions => {
+      const id = feature.properties.fieldId;
+      const inFilter = id != null && filteredIds.has(id);
+      const isSelected = id != null && selectedId === id;
+      const ranch = feature.properties.ranch ?? '';
+      const crop = feature.properties.crop ?? '';
+      const stroke = isSelected ? '#ffffff' : ranchColor(ranch);
+      const fill = inFilter ? cropBg(crop) : '#888888';
       return {
-        id,
-        path,
-        cx,
-        cy,
-        props: f.properties,
+        color: stroke,
+        weight: isSelected ? 3 : 1.5,
+        opacity: 1,
+        fillColor: fill,
+        fillOpacity: isSelected ? 0.75 : inFilter ? 0.55 : 0.2,
       };
+    };
+  }, [filteredIds, selectedId, ranchColor, cropBg]);
+
+  // Initialize the map once data is available.
+  useEffect(() => {
+    if (!data || !containerRef.current || mapRef.current) return;
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
+
+    (async () => {
+      const L = (await import('leaflet')).default;
+      if (cancelled || !containerRef.current) return;
+
+      const map = L.map(containerRef.current, {
+        zoomControl: true,
+        scrollWheelZoom: true,
+        worldCopyJump: false,
+      });
+      mapRef.current = map;
+
+      const satellite = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          maxZoom: 19,
+          attribution:
+            'Imagery &copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics, USDA, USGS, AeroGRID, IGN, GIS User Community',
+        },
+      );
+      const streets = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png',
+        {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        },
+      );
+      tileRef.current = { satellite, streets };
+      satellite.addTo(map);
+
+      const layer = L.geoJSON(data as GeoJSON.GeoJsonObject, {
+        style: (feat) => styleFor(feat as unknown as FieldFeature),
+        onEachFeature: (feat, lyr) => {
+          const f = feat as unknown as FieldFeature;
+          const id = f.properties.fieldId;
+          if (id != null) idToLayerRef.current.set(id, lyr);
+          const acres = f.properties.acres;
+          const labelBlock = f.properties.block ?? f.properties.kmlName;
+          const tooltip = `${labelBlock}${acres != null ? ` — ${formatAcres(acres)} ac` : ''}`;
+          lyr.bindTooltip(tooltip, { sticky: true, direction: 'top', opacity: 0.9 });
+          lyr.on({
+            click: () => {
+              if (id != null) onSelect(id);
+            },
+            mouseover: (e) => {
+              const target = e.target as Path;
+              target.setStyle({ weight: 3, fillOpacity: 0.7 });
+              target.bringToFront();
+            },
+            mouseout: (e) => {
+              const target = e.target as Path;
+              target.setStyle(styleFor(f));
+            },
+          });
+        },
+      }).addTo(map);
+      layerRef.current = layer;
+
+      const bounds = layer.getBounds();
+      boundsRef.current = bounds;
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [24, 24] });
+      } else {
+        map.setView([37.41, -120.77], 14);
+      }
+
+      cleanup = () => {
+        map.remove();
+        mapRef.current = null;
+        layerRef.current = null;
+        tileRef.current = null;
+        idToLayerRef.current.clear();
+      };
+    })().catch(e => {
+      if (!cancelled) setError(`Map init failed: ${e}`);
     });
-    return { polys, bounds: { minLon, maxLon, minLat, maxLat } };
+
+    return () => {
+      cancelled = true;
+      if (cleanup) cleanup();
+    };
+    // We deliberately only initialize on data load; styleFor changes are
+    // handled by a separate effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  function onWheel(e: React.WheelEvent<SVGSVGElement>) {
-    e.preventDefault();
-    const svg = svgRef.current;
-    if (!svg) return;
-    const rect = svg.getBoundingClientRect();
-    const px = ((e.clientX - rect.left) / rect.width) * VIEW_W;
-    const py = ((e.clientY - rect.top) / rect.height) * VIEW_H;
-    const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
-    setView(v => {
-      const newScale = Math.max(1, Math.min(20, v.scale * factor));
-      // Zoom toward cursor: keep the world-point under the cursor stable.
-      const wx = (px - v.tx) / v.scale;
-      const wy = (py - v.ty) / v.scale;
-      return { scale: newScale, tx: px - wx * newScale, ty: py - wy * newScale };
+  // Re-style polygons whenever filter or selection changes.
+  useEffect(() => {
+    const layer = layerRef.current;
+    if (!layer) return;
+    layer.eachLayer((lyr) => {
+      const f = (lyr as unknown as { feature: FieldFeature }).feature;
+      if (!f) return;
+      (lyr as Path).setStyle(styleFor(f));
     });
-  }
+  }, [styleFor]);
 
-  function onPointerDown(e: React.PointerEvent<SVGSVGElement>) {
-    (e.target as Element).setPointerCapture?.(e.pointerId);
-    dragRef.current = { x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty };
-  }
-  function onPointerMove(e: React.PointerEvent<SVGSVGElement>) {
-    if (!dragRef.current) return;
-    const svg = svgRef.current;
-    if (!svg) return;
-    const rect = svg.getBoundingClientRect();
-    const k = VIEW_W / rect.width;
-    const dx = (e.clientX - dragRef.current.x) * k;
-    const dy = (e.clientY - dragRef.current.y) * k;
-    setView(v => ({ ...v, tx: dragRef.current!.tx + dx, ty: dragRef.current!.ty + dy }));
-  }
-  function onPointerUp(e: React.PointerEvent<SVGSVGElement>) {
-    dragRef.current = null;
-    (e.target as Element).releasePointerCapture?.(e.pointerId);
-  }
+  // Pan/zoom to selected polygon when selection changes.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || selectedId == null) return;
+    const lyr = idToLayerRef.current.get(selectedId) as Polygon | undefined;
+    if (!lyr) return;
+    const b = lyr.getBounds();
+    if (b.isValid()) {
+      map.flyToBounds(b, { padding: [40, 40], duration: 0.5, maxZoom: 17 });
+    }
+    lyr.bringToFront();
+  }, [selectedId]);
+
+  // Switch basemap when toggle changes.
+  useEffect(() => {
+    const map = mapRef.current;
+    const tiles = tileRef.current;
+    if (!map || !tiles) return;
+    if (basemap === 'satellite') {
+      if (map.hasLayer(tiles.streets)) map.removeLayer(tiles.streets);
+      if (!map.hasLayer(tiles.satellite)) tiles.satellite.addTo(map);
+    } else {
+      if (map.hasLayer(tiles.satellite)) map.removeLayer(tiles.satellite);
+      if (!map.hasLayer(tiles.streets)) tiles.streets.addTo(map);
+    }
+  }, [basemap]);
+
+  const selectedFeature = useMemo(() => {
+    if (!data || selectedId == null) return null;
+    return data.features.find(f => f.properties.fieldId === selectedId) ?? null;
+  }, [data, selectedId]);
 
   function resetView() {
-    setView({ scale: 1, tx: 0, ty: 0 });
+    const map = mapRef.current;
+    const bounds = boundsRef.current;
+    if (map && bounds && bounds.isValid()) {
+      map.flyToBounds(bounds, { padding: [24, 24], duration: 0.4 });
+    }
   }
 
   if (error) {
     return (
       <div style={{ padding: '24px', backgroundColor: '#fff', borderRadius: '12px', color: '#a33' }}>
-        Could not load <code>fields.geojson</code>: {error}
+        Could not load field map: {error}
       </div>
     );
   }
 
-  if (!projected) {
-    return (
-      <div style={{ padding: '24px', backgroundColor: '#fff', borderRadius: '12px', color: '#666' }}>
-        Loading field boundaries…
-      </div>
-    );
-  }
-
-  const matchedCount = data?.metadata?.matchedCount ?? projected.polys.filter(p => p.props.matched).length;
-  const totalPolys = data?.metadata?.polygonCount ?? projected.polys.length;
+  const totalPolys = data?.metadata?.polygonCount ?? data?.features.length ?? 0;
+  const matchedCount = data?.metadata?.matchedCount ?? data?.features.filter(f => f.properties.matched).length ?? 0;
 
   return (
     <div style={{ display: 'grid', gap: '8px' }} data-testid="field-map">
       <div
         style={{
           position: 'relative',
-          backgroundColor: '#F4EEE0',
+          backgroundColor: '#1a1a1a',
           borderRadius: '16px',
           overflow: 'hidden',
-          border: '1px solid #e9dfc7',
+          border: '1px solid #d0c8b0',
           boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.05)',
         }}
       >
-        <svg
-          ref={svgRef}
-          viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-          width="100%"
-          style={{ display: 'block', cursor: dragRef.current ? 'grabbing' : 'grab', touchAction: 'none' }}
-          role="img"
-          aria-label={`Map of ${totalPolys} field boundaries from Google Earth KML`}
-          onWheel={onWheel}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-        >
-          <g transform={`translate(${view.tx} ${view.ty}) scale(${view.scale})`}>
-            {projected.polys.map(p => {
-              const id = p.id;
-              const inFilter = id != null && filteredIds.has(id);
-              const isSelected = id != null && selectedId === id;
-              const isHover = id != null && hoverId === id;
-              const ranch = p.props.ranch ?? '';
-              const crop = p.props.crop ?? '';
-              const stroke = ranchColor(ranch);
-              const fill = inFilter ? cropBg(crop) : '#dcd2bd';
-              const opacity = inFilter ? 1 : 0.45;
-              return (
-                <path
-                  key={p.props.kmlName}
-                  d={p.path}
-                  fill={fill}
-                  fillOpacity={isSelected ? 0.95 : isHover ? 0.85 : opacity}
-                  stroke={isSelected ? '#222' : stroke}
-                  strokeWidth={(isSelected ? 2.5 : 1.2) / view.scale}
-                  style={{ cursor: 'pointer', transition: 'fill-opacity 120ms' }}
-                  onClick={(e) => { e.stopPropagation(); onSelect(id); }}
-                  onMouseEnter={() => setHoverId(id)}
-                  onMouseLeave={() => setHoverId(prev => (prev === id ? null : prev))}
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onSelect(id);
-                    }
-                  }}
-                  aria-label={`${p.props.block ?? p.props.kmlName}${p.props.acres != null ? `, ${formatAcres(p.props.acres)} acres` : ''}`}
-                >
-                  <title>
-                    {p.props.block ?? p.props.kmlName}
-                    {p.props.acres != null ? ` — ${formatAcres(p.props.acres)} ac` : ''}
-                  </title>
-                </path>
-              );
-            })}
-            {/* Field-number labels (only when zoomed in enough to be readable). */}
-            {view.scale >= 1.6 && projected.polys.map(p => (
-              p.props.fieldNumber != null ? (
-                <text
-                  key={`lbl-${p.props.kmlName}`}
-                  x={p.cx}
-                  y={p.cy}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={10 / view.scale}
-                  fontWeight={600}
-                  fill="#222"
-                  style={{ pointerEvents: 'none', paintOrder: 'stroke', stroke: 'rgba(255,255,255,0.85)', strokeWidth: 2 / view.scale }}
-                >
-                  {p.props.fieldNumber}
-                </text>
-              ) : null
-            ))}
-          </g>
-        </svg>
+        <div
+          ref={containerRef}
+          role="application"
+          aria-label={`Satellite map of ${totalPolys} field boundaries`}
+          style={{ width: '100%', height: '560px' }}
+        />
+        {!data && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              backgroundColor: 'rgba(0,0,0,0.4)',
+            }}
+          >
+            Loading field boundaries…
+          </div>
+        )}
         <div
           style={{
             position: 'absolute',
             top: '8px',
-            right: '8px',
+            left: '8px',
+            zIndex: 500,
             display: 'flex',
             gap: '4px',
+            backgroundColor: 'rgba(255,255,255,0.92)',
+            padding: '4px',
+            borderRadius: '8px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
           }}
         >
-          <MapBtn onClick={() => setView(v => ({ ...v, scale: Math.min(20, v.scale * 1.4) }))} label="+" title="Zoom in" />
-          <MapBtn onClick={() => setView(v => ({ ...v, scale: Math.max(1, v.scale / 1.4) }))} label="−" title="Zoom out" />
-          <MapBtn onClick={resetView} label="Reset" title="Reset view" />
+          <BasemapBtn active={basemap === 'satellite'} onClick={() => setBasemap('satellite')} label="Satellite" />
+          <BasemapBtn active={basemap === 'streets'} onClick={() => setBasemap('streets')} label="Streets" />
+          <button
+            type="button"
+            onClick={resetView}
+            title="Fit to all fields"
+            aria-label="Fit to all fields"
+            style={{
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              backgroundColor: 'white',
+              fontWeight: 500,
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            Fit
+          </button>
         </div>
         <div
           style={{
             position: 'absolute',
             bottom: '8px',
             left: '8px',
-            backgroundColor: 'rgba(255,255,255,0.85)',
+            zIndex: 500,
+            backgroundColor: 'rgba(255,255,255,0.9)',
             borderRadius: '6px',
             padding: '4px 8px',
             fontSize: '11px',
-            color: '#555',
+            color: '#333',
           }}
         >
-          {totalPolys} polygons · {matchedCount} matched to block list · scroll to zoom · drag to pan
+          {totalPolys} fields · {matchedCount} matched · drag to pan · scroll to zoom
         </div>
       </div>
+      {selectedFeature && (
+        <div
+          role="status"
+          style={{
+            backgroundColor: 'white',
+            border: '1px solid #e5dec7',
+            borderRadius: '10px',
+            padding: '8px 12px',
+            fontSize: '13px',
+            color: '#333',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <span>
+            Selected: <strong>{selectedFeature.properties.block ?? selectedFeature.properties.kmlName}</strong>
+            {selectedFeature.properties.acres != null && (
+              <> · {formatAcres(selectedFeature.properties.acres)} ac</>
+            )}
+            {selectedFeature.properties.crop && <> · {selectedFeature.properties.crop}</>}
+          </span>
+          <button
+            type="button"
+            onClick={() => onSelect(null)}
+            style={{
+              padding: '4px 10px',
+              borderRadius: '6px',
+              border: '1px solid #C55A2E',
+              backgroundColor: 'white',
+              color: '#C55A2E',
+              cursor: 'pointer',
+              fontSize: '12px',
+            }}
+          >
+            Clear
+          </button>
+        </div>
+      )}
       {matchedCount < totalPolys && (
         <div
           role="note"
@@ -322,23 +402,21 @@ export default function FieldMap({
   );
 }
 
-function MapBtn({ onClick, label, title }: { onClick: () => void; label: string; title: string }) {
+function BasemapBtn({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      title={title}
-      aria-label={title}
+      aria-pressed={active}
       style={{
-        width: label.length > 1 ? 'auto' : '32px',
-        height: '32px',
-        padding: label.length > 1 ? '0 10px' : 0,
+        padding: '6px 10px',
         borderRadius: '6px',
-        border: '1px solid #ccc',
-        backgroundColor: 'white',
-        fontWeight: 600,
+        border: active ? '1px solid #C55A2E' : '1px solid #ccc',
+        backgroundColor: active ? '#C55A2E' : 'white',
+        color: active ? 'white' : '#333',
+        fontWeight: active ? 600 : 500,
+        fontSize: '12px',
         cursor: 'pointer',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
       }}
     >
       {label}

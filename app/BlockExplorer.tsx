@@ -83,10 +83,10 @@ export default function BlockExplorer() {
         }}
         data-testid="map-note"
       >
-        <strong>Field boundaries from Google Earth.</strong> The map below shows
-        each block&rsquo;s real footprint, drawn from{' '}
-        <code>public/Farming-Field-Map.kml</code>. The tile grid underneath is
-        sized by acreage for quick comparison.
+        <strong>Field boundaries from Google Earth, on satellite imagery.</strong>{' '}
+        Polygons come from <code>public/Farming-Field-Map.kml</code> and are
+        drawn over Esri World Imagery. Click a polygon (or a tile below) to
+        focus a block. Tile sizes underneath show relative acreage.
       </div>
 
       <div

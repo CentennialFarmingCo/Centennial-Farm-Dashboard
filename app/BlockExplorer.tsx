@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FIELDS, formatAcres, type Field } from "./stats";
 import FieldMap from "./FieldMap";
+import { soilColor, type FieldSoilSummary, type SoilSummaryDoc } from "./soils";
 
 const RANCH_COLORS: Record<string, string> = {
   Johnston: '#C55A2E',
@@ -32,6 +33,22 @@ export default function BlockExplorer() {
   const [variety, setVariety] = useState<string>('all');
   const [query, setQuery] = useState<string>('');
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [soilSummary, setSoilSummary] = useState<SoilSummaryDoc | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('soil-summary.json')
+      .then(r => r.ok ? r.json() : null)
+      .then((json: SoilSummaryDoc | null) => { if (!cancelled && json) setSoilSummary(json); })
+      .catch(() => {/* soil panel just won't show */});
+    return () => { cancelled = true; };
+  }, []);
+
+  const soilByFieldId = useMemo(() => {
+    const m = new Map<number, FieldSoilSummary>();
+    for (const f of soilSummary?.fields ?? []) m.set(f.fieldId, f);
+    return m;
+  }, [soilSummary]);
 
   const crops = useMemo(
     () => Array.from(new Set(FIELDS.map(f => f.crop))).sort(),
@@ -85,8 +102,10 @@ export default function BlockExplorer() {
       >
         <strong>Field boundaries from Google Earth, on satellite imagery.</strong>{' '}
         Polygons come from <code>public/Farming-Field-Map.kml</code> and are
-        drawn over Esri World Imagery. Click a polygon (or a tile below) to
-        focus a block. Tile sizes underneath show relative acreage.
+        drawn over Esri World Imagery. Toggle the <strong>Soils</strong> button
+        on the map to overlay USDA NRCS SSURGO soil map units, colored by
+        hydrologic group. Click a polygon (or a tile below) to focus a
+        block — its soil composition appears in the details card.
       </div>
 
       <div
@@ -288,6 +307,7 @@ export default function BlockExplorer() {
                   </dd>
                 </div>
               </dl>
+              <SoilComposition summary={soilByFieldId.get(selected.id) ?? null} />
             </div>
           ) : (
             <div>
@@ -311,5 +331,85 @@ export default function BlockExplorer() {
         </aside>
       </div>
     </div>
+  );
+}
+
+function SoilComposition({ summary }: { summary: FieldSoilSummary | null }) {
+  if (!summary) return null;
+  const { components } = summary;
+  if (!components || components.length === 0) return null;
+
+  return (
+    <section
+      aria-label="Soil composition"
+      data-testid="soil-composition"
+      style={{
+        marginTop: '16px',
+        paddingTop: '12px',
+        borderTop: '1px dashed #d8cfb6',
+      }}
+    >
+      <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: '#888', margin: '0 0 6px', letterSpacing: '0.04em' }}>
+        Soil composition (USDA SSURGO)
+      </h4>
+      <div
+        role="img"
+        aria-label={`Soil composition: ${components.map(c => `${c.percent}% ${c.musym ?? c.muname ?? c.mukey}`).join(', ')}`}
+        style={{
+          display: 'flex',
+          height: '10px',
+          borderRadius: '5px',
+          overflow: 'hidden',
+          border: '1px solid #ddd',
+          marginBottom: '8px',
+        }}
+      >
+        {components.map(c => (
+          <span
+            key={c.mukey}
+            title={`${c.percent}% ${c.musym ?? ''} ${c.muname ?? ''}`}
+            style={{
+              flexBasis: `${Math.max(c.percent, 0.5)}%`,
+              backgroundColor: soilColor(c.hydrologicGroup),
+            }}
+          />
+        ))}
+      </div>
+      <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '6px', fontSize: '12px' }}>
+        {components.map(c => (
+          <li key={c.mukey} style={{ display: 'grid', gridTemplateColumns: '14px 1fr auto', gap: '8px', alignItems: 'flex-start' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '12px',
+                height: '12px',
+                marginTop: '3px',
+                borderRadius: '3px',
+                backgroundColor: soilColor(c.hydrologicGroup),
+                border: '1px solid rgba(0,0,0,0.15)',
+              }}
+            />
+            <span>
+              <strong>{c.musym ?? '—'}</strong>
+              {c.muname && <> · {c.muname}</>}
+              {(c.drainageClass || c.hydrologicGroup) && (
+                <span style={{ color: '#666', display: 'block', fontSize: '11px', lineHeight: 1.3 }}>
+                  {c.drainageClass}
+                  {c.drainageClass && c.hydrologicGroup ? ' · ' : ''}
+                  {c.hydrologicGroup ? `Hydrologic group ${c.hydrologicGroup}` : ''}
+                </span>
+              )}
+            </span>
+            <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+              {c.percent}% · {formatAcres(c.acres)} ac
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p style={{ fontSize: '10px', color: '#888', margin: '8px 0 0', lineHeight: 1.4 }}>
+        Source: USDA NRCS SSURGO via Soil Data Access. Survey lines are
+        approximate; not a substitute for on-site sampling.
+      </p>
+    </section>
   );
 }

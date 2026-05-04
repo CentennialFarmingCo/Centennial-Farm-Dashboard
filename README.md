@@ -41,6 +41,12 @@ This is a Next.js static export (`output: 'export'` in `next.config.js`). On
 Vercel, just import the repo — no special settings needed. The build produces
 a fully static site in `out/`.
 
+`npm run build` runs `phenology:build` automatically (via npm's `prebuild`
+lifecycle), so each Vercel build regenerates `public/phenology-summary.json`
+from the live CIMIS API using `CIMIS_APP_KEY` from the project's environment
+variables. If the key isn't set the script writes an *unavailable*-state
+JSON and the build still succeeds (see "Seasonal Models").
+
 ## Configuring your farm location (weather)
 
 The weather panel pulls live data from Open-Meteo for a single point. The
@@ -263,7 +269,7 @@ browser. Set it in whichever environment runs `npm run phenology:build`:
 
 | Environment | Where to set it |
 | --- | --- |
-| **Vercel** | Project → Settings → Environment Variables → `CIMIS_APP_KEY` (mark *not* `NEXT_PUBLIC_*` so it stays server/build-only). Re-deploy to refresh. |
+| **Vercel** | Project → Settings → Environment Variables → `CIMIS_APP_KEY` (mark *not* `NEXT_PUBLIC_*` so it stays server/build-only). Apply to **Production** and **Preview**. The `prebuild` step regenerates the JSON on every deploy — redeploy to refresh. |
 | **GitHub Actions** | Repo → Settings → Secrets → Actions → `CIMIS_APP_KEY`. Reference as `${{ secrets.CIMIS_APP_KEY }}` in the workflow that runs `phenology:build`. |
 | **Local** | `export CIMIS_APP_KEY=…` in your shell, or put it in a local `.env` (already git-ignored). |
 
@@ -291,10 +297,22 @@ If `CIMIS_APP_KEY` is unset (or the CIMIS API is unreachable), the build
 writes an *unavailable*-state `phenology-summary.json` (no chill / DD
 numbers) so the dashboard can still build cleanly and render a clearly
 labeled "data unavailable" panel with setup instructions. The validator
-also passes in this state.
+also passes in this state. The script always exits `0` so a CIMIS
+outage never fails Vercel/CI builds; the JSON's `metadata.errorKind`
+field plus the `[phenology]` log lines explain why (`missing-key`,
+`auth`, `network`, `bad-date`, `no-data`, `cimis-server-error`,
+`rate-limited`, `unexpected`, …). The CIMIS AppKey is redacted from any
+error text written to logs or the JSON.
 
-Commit the regenerated `public/phenology-summary.json` together with any
-other refresh.
+Hourly fetches are split into ≤60-day chunks to stay under the CIMIS
+Web API's 1,750-record-per-request cap (the chill-season window of
+Nov 1 → Mar 1 returns ~2,880 hourly records and would otherwise be
+rejected as a single request).
+
+Committing the regenerated `public/phenology-summary.json` is optional —
+Vercel's `prebuild` step will overwrite it on every deploy with fresh
+CIMIS data. Commit it only if you want to ship the most recent values
+without waiting for the next deploy.
 
 ## Scripts
 

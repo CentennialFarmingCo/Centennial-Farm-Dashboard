@@ -174,7 +174,75 @@ function fToC(f) {
 }
 
 // ---------- CIMIS Web API client ----------
-async function fetchCimisHourly(stationId, startDate, endDate) {
+// CIMIS Web API caps responses at 1,750 records per request. For a single
+// station, hourly air temperature returns 24 records/day, so any chunk must
+// stay under ~72 days. We use 60 days for headroom.
+const CIMIS_HOURLY_CHUNK_DAYS = 60;
+// CIMIS daily data is at most 1 record/day, so 1,750 days fits in a single
+// request — no chunking needed for typical season-to-date windows.
+
+// Strip the appKey from any string before logging, just in case the API
+// echoes it back in an error body or it ends up in a stack trace.
+function redactKey(s) {
+  if (typeof s !== 'string' || !CIMIS_APP_KEY) return s;
+  return s.split(CIMIS_APP_KEY).join('***REDACTED_APPKEY***');
+}
+
+// Classify a fetch error / non-2xx response into a stable category for the
+// JSON `errorKind` field and logging. Never includes the appKey.
+function classifyHttpError({ status, body, network }) {
+  if (network) return 'network';
+  if (status === 401 || status === 403) return 'auth';
+  if (status === 400) {
+    const b = (body || '').toLowerCase();
+    if (b.includes('appkey') || b.includes('app key')) return 'auth';
+    if (b.includes('date')) return 'bad-date';
+    return 'bad-request';
+  }
+  if (status === 404) return 'not-found';
+  if (status === 429) return 'rate-limited';
+  if (status >= 500) return 'cimis-server-error';
+  return 'http-error';
+}
+
+async function cimisFetch(url, label) {
+  let r;
+  try {
+    r = await fetch(url, { headers: { Accept: 'application/json' } });
+  } catch (e) {
+    const err = new Error(`${label} network failure: ${redactKey(e.message)}`);
+    err.errorKind = 'network';
+    err.httpStatus = null;
+    throw err;
+  }
+  if (!r.ok) {
+    let body = '';
+    try {
+      body = (await r.text()).slice(0, 500);
+    } catch {
+      /* ignore */
+    }
+    const kind = classifyHttpError({ status: r.status, body, network: false });
+    const err = new Error(
+      `${label} HTTP ${r.status} (${kind}): ${redactKey(body)}`,
+    );
+    err.errorKind = kind;
+    err.httpStatus = r.status;
+    throw err;
+  }
+  try {
+    return await r.json();
+  } catch (e) {
+    const err = new Error(
+      `${label} returned non-JSON response: ${redactKey(e.message)}`,
+    );
+    err.errorKind = 'bad-response';
+    err.httpStatus = r.status;
+    throw err;
+  }
+}
+
+async function fetchCimisHourlyChunk(stationId, startDate, endDate) {
   const url = new URL('https://et.water.ca.gov/api/data');
   url.searchParams.set('appKey', CIMIS_APP_KEY);
   url.searchParams.set('targets', stationId);
@@ -182,11 +250,28 @@ async function fetchCimisHourly(stationId, startDate, endDate) {
   url.searchParams.set('endDate', endDate);
   url.searchParams.set('dataItems', 'hly-air-tmp');
   url.searchParams.set('unitOfMeasure', 'E'); // English (Fahrenheit)
-  const r = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!r.ok) {
-    throw new Error(`CIMIS HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`);
+  return cimisFetch(url, `CIMIS hourly (${startDate}→${endDate})`);
+}
+
+// Fetch hourly data across a window by splitting into <=60-day chunks to stay
+// under the CIMIS 1,750 record/request limit. Concatenates Records arrays.
+async function fetchCimisHourly(stationId, startDate, endDate) {
+  const chunks = chunkDateRange(startDate, endDate, CIMIS_HOURLY_CHUNK_DAYS);
+  if (chunks.length === 0) {
+    const err = new Error(
+      `CIMIS hourly: empty/invalid date range ${startDate} → ${endDate}`,
+    );
+    err.errorKind = 'bad-date';
+    throw err;
   }
-  return r.json();
+  const allRecords = [];
+  for (const [s, e] of chunks) {
+    console.log(`  CIMIS hourly chunk ${s} → ${e}`);
+    const j = await fetchCimisHourlyChunk(stationId, s, e);
+    const recs = j?.Data?.Providers?.[0]?.Records ?? [];
+    allRecords.push(...recs);
+  }
+  return { Data: { Providers: [{ Records: allRecords }] } };
 }
 
 async function fetchCimisDaily(stationId, startDate, endDate) {
@@ -197,20 +282,40 @@ async function fetchCimisDaily(stationId, startDate, endDate) {
   url.searchParams.set('endDate', endDate);
   url.searchParams.set('dataItems', 'day-air-tmp-min,day-air-tmp-max');
   url.searchParams.set('unitOfMeasure', 'E');
-  const r = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!r.ok) {
-    throw new Error(`CIMIS HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`);
-  }
-  return r.json();
+  return cimisFetch(url, `CIMIS daily (${startDate}→${endDate})`);
 }
 
 async function fetchCimisStationMeta(stationId) {
   const url = `https://et.water.ca.gov/api/station/${encodeURIComponent(stationId)}`;
-  const r = await fetch(url, { headers: { Accept: 'application/json' } });
-  if (!r.ok) {
-    throw new Error(`CIMIS station meta HTTP ${r.status}`);
+  return cimisFetch(url, `CIMIS station meta (${stationId})`);
+}
+
+// Split [start, end] (inclusive, ISO YYYY-MM-DD) into consecutive chunks each
+// at most `maxDays` long (inclusive). Returns [[s0,e0], [s1,e1], ...]. Returns
+// [] if start > end or either date is malformed.
+function chunkDateRange(startDate, endDate, maxDays) {
+  if (!isIsoDateStr(startDate) || !isIsoDateStr(endDate)) return [];
+  const start = new Date(`${startDate}T00:00:00Z`);
+  const end = new Date(`${endDate}T00:00:00Z`);
+  if (!(start.getTime() <= end.getTime())) return [];
+  const out = [];
+  let cursor = start;
+  const ONE_DAY_MS = 86400000;
+  while (cursor.getTime() <= end.getTime()) {
+    const chunkEnd = new Date(
+      Math.min(
+        cursor.getTime() + (maxDays - 1) * ONE_DAY_MS,
+        end.getTime(),
+      ),
+    );
+    out.push([isoDate(cursor), isoDate(chunkEnd)]);
+    cursor = new Date(chunkEnd.getTime() + ONE_DAY_MS);
   }
-  return r.json();
+  return out;
+}
+
+function isIsoDateStr(s) {
+  return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
 }
 
 function parseHourlyTempsF(cimisJson) {
@@ -239,18 +344,43 @@ function parseDailyTempsF(cimisJson) {
   });
 }
 
-function unavailable(reason, extra = {}) {
+// errorKind values:
+//   'missing-key'        — CIMIS_APP_KEY not configured
+//   'auth'               — 401/403 or CIMIS rejected the AppKey
+//   'http-error'         — non-2xx response not otherwise classified
+//   'bad-request'        — 400 with non-key, non-date message
+//   'bad-date'           — 400/date-range invalid or empty window
+//   'not-found'          — 404 (e.g. unknown station)
+//   'rate-limited'       — 429
+//   'cimis-server-error' — 5xx
+//   'network'            — DNS/connection failure
+//   'bad-response'       — 2xx but body could not be parsed as JSON
+//   'no-data'            — request succeeded but returned no usable records
+//   'unexpected'         — uncaught exception
+function unavailable(reason, errorKind, extra = {}) {
   return {
     metadata: {
       generatedAt: new Date().toISOString(),
       available: false,
-      reason,
+      reason: redactKey(reason),
+      errorKind: errorKind || 'unknown',
       ...extra,
     },
     chill: null,
     degreeDays: null,
     blocks: [],
   };
+}
+
+function writeUnavailable(reason, errorKind, extra = {}) {
+  const doc = unavailable(reason, errorKind, extra);
+  writeFileSync(OUT_PATH, JSON.stringify(doc, null, 2));
+  console.warn(
+    `[phenology] available:false (${errorKind}): ${redactKey(reason).slice(0, 200)}`,
+  );
+  console.warn(
+    `[phenology] wrote ${OUT_PATH} — build will continue; dashboard will show unavailable state.`,
+  );
 }
 
 function classifyPestForCrop(crop) {
@@ -260,46 +390,74 @@ function classifyPestForCrop(crop) {
 }
 
 async function main() {
+  const baseConfigHint = {
+    stationId: CIMIS_STATION,
+    chillSeason: { start: CHILL_SEASON_START, end: CHILL_SEASON_END },
+    degreeDayWindow: { start: DD_START, end: DD_END },
+    requiredEnv: ['CIMIS_APP_KEY'],
+    optionalEnv: [
+      'CIMIS_STATION',
+      'CHILL_SEASON_START',
+      'CHILL_SEASON_END',
+      'PHENOLOGY_START_DATE',
+      'PHENOLOGY_END_DATE',
+      'DEGREE_DAY_BIOFIX_PEACH',
+      'DEGREE_DAY_BIOFIX_ALMOND',
+    ],
+  };
+
   if (!CIMIS_APP_KEY) {
-    const doc = unavailable(
+    writeUnavailable(
       'No CIMIS_APP_KEY configured at build time. Set CIMIS_APP_KEY (and optionally CIMIS_STATION) to fetch live chill portions and pest degree-day totals. See README "Seasonal Models" section.',
+      'missing-key',
       {
-        configHint: {
-          requiredEnv: ['CIMIS_APP_KEY'],
-          optionalEnv: [
-            'CIMIS_STATION',
-            'CHILL_SEASON_START',
-            'CHILL_SEASON_END',
-            'PHENOLOGY_START_DATE',
-            'PHENOLOGY_END_DATE',
-            'DEGREE_DAY_BIOFIX_PEACH',
-            'DEGREE_DAY_BIOFIX_ALMOND',
-          ],
-          chillSeason: { start: CHILL_SEASON_START, end: CHILL_SEASON_END },
-          degreeDayWindow: { start: DD_START, end: DD_END },
-          stationId: CIMIS_STATION,
-        },
+        configHint: baseConfigHint,
         models: pestModelsForReport(),
       },
-    );
-    writeFileSync(OUT_PATH, JSON.stringify(doc, null, 2));
-    console.log(
-      `No CIMIS_APP_KEY set; wrote ${OUT_PATH} with available:false (dashboard will render an unavailable state).`,
     );
     return;
   }
 
-  console.log(`Fetching CIMIS station ${CIMIS_STATION} metadata...`);
+  // Sanity-check date ranges before hitting CIMIS.
+  if (
+    !isIsoDateStr(CHILL_SEASON_START) ||
+    !isIsoDateStr(CHILL_SEASON_END) ||
+    CHILL_SEASON_START >= CHILL_SEASON_END
+  ) {
+    writeUnavailable(
+      `Invalid CHILL_SEASON window: ${CHILL_SEASON_START} → ${CHILL_SEASON_END} (must be ISO YYYY-MM-DD with start < end)`,
+      'bad-date',
+      { configHint: baseConfigHint, models: pestModelsForReport() },
+    );
+    return;
+  }
+  if (
+    !isIsoDateStr(DD_START) ||
+    !isIsoDateStr(DD_END) ||
+    DD_START > DD_END
+  ) {
+    writeUnavailable(
+      `Invalid degree-day window: ${DD_START} → ${DD_END} (must be ISO YYYY-MM-DD with start <= end)`,
+      'bad-date',
+      { configHint: baseConfigHint, models: pestModelsForReport() },
+    );
+    return;
+  }
+
+  console.log(`[phenology] Fetching CIMIS station ${CIMIS_STATION} metadata...`);
   let stationMeta = null;
   try {
     const j = await fetchCimisStationMeta(CIMIS_STATION);
     stationMeta = j?.Stations?.[0] ?? null;
   } catch (e) {
-    console.warn(`Station meta unavailable: ${e.message}`);
+    // Station metadata is optional — keep building with id-only.
+    console.warn(
+      `[phenology] Station meta unavailable (${e.errorKind || 'unknown'}): ${redactKey(e.message)}`,
+    );
   }
 
   console.log(
-    `Fetching CIMIS hourly air temperature ${CHILL_SEASON_START} → ${CHILL_SEASON_END} (chill window)...`,
+    `[phenology] Fetching CIMIS hourly air temperature ${CHILL_SEASON_START} → ${CHILL_SEASON_END} (chill window, chunked ≤${CIMIS_HOURLY_CHUNK_DAYS}d)...`,
   );
   let hourly;
   try {
@@ -309,48 +467,61 @@ async function main() {
       CHILL_SEASON_END,
     );
   } catch (e) {
-    const doc = unavailable(`CIMIS hourly fetch failed: ${e.message}`, {
-      configHint: {
-        stationId: CIMIS_STATION,
-        chillSeason: { start: CHILL_SEASON_START, end: CHILL_SEASON_END },
-        degreeDayWindow: { start: DD_START, end: DD_END },
+    writeUnavailable(
+      `CIMIS hourly fetch failed: ${e.message}`,
+      e.errorKind || 'http-error',
+      {
+        httpStatus: e.httpStatus ?? null,
+        configHint: baseConfigHint,
+        models: pestModelsForReport(),
       },
-      models: pestModelsForReport(),
-    });
-    writeFileSync(OUT_PATH, JSON.stringify(doc, null, 2));
-    console.error(`Wrote unavailable state due to CIMIS hourly fetch failure.`);
-    process.exitCode = 2;
+    );
     return;
   }
 
   const hourlyRecs = parseHourlyTempsF(hourly);
   const validHourly = hourlyRecs.filter(r => Number.isFinite(r.tF));
   console.log(
-    `Hourly records: ${hourlyRecs.length} total / ${validHourly.length} with valid air temperature`,
+    `[phenology] Hourly records: ${hourlyRecs.length} total / ${validHourly.length} with valid air temperature`,
   );
+
+  if (hourlyRecs.length === 0) {
+    writeUnavailable(
+      `CIMIS hourly returned 0 records for station ${CIMIS_STATION} ${CHILL_SEASON_START} → ${CHILL_SEASON_END}. Verify station number and that data exists for that window.`,
+      'no-data',
+      { configHint: baseConfigHint, models: pestModelsForReport() },
+    );
+    return;
+  }
+  if (validHourly.length === 0) {
+    writeUnavailable(
+      `CIMIS hourly returned ${hourlyRecs.length} records but none had a usable air-temperature value for station ${CIMIS_STATION} ${CHILL_SEASON_START} → ${CHILL_SEASON_END}.`,
+      'no-data',
+      { configHint: baseConfigHint, models: pestModelsForReport() },
+    );
+    return;
+  }
 
   const hourlyC = validHourly.map(r => fToC(r.tF));
   const chillPortions = chillPortionsFromHourlyC(hourlyC);
 
   console.log(
-    `Fetching CIMIS daily min/max air temperature ${DD_START} → ${DD_END} (DD window)...`,
+    `[phenology] Fetching CIMIS daily min/max air temperature ${DD_START} → ${DD_END} (DD window)...`,
   );
   let daily;
   try {
     daily = await fetchCimisDaily(CIMIS_STATION, DD_START, DD_END);
   } catch (e) {
-    const doc = unavailable(`CIMIS daily fetch failed: ${e.message}`, {
-      configHint: {
-        stationId: CIMIS_STATION,
-        chillSeason: { start: CHILL_SEASON_START, end: CHILL_SEASON_END },
-        degreeDayWindow: { start: DD_START, end: DD_END },
+    writeUnavailable(
+      `CIMIS daily fetch failed: ${e.message}`,
+      e.errorKind || 'http-error',
+      {
+        httpStatus: e.httpStatus ?? null,
+        configHint: baseConfigHint,
+        partialChillPortions: Number(chillPortions.toFixed(2)),
+        models: pestModelsForReport(),
       },
-      partialChillPortions: Number(chillPortions.toFixed(2)),
-      models: pestModelsForReport(),
-    });
-    writeFileSync(OUT_PATH, JSON.stringify(doc, null, 2));
-    console.error(`Wrote unavailable state due to CIMIS daily fetch failure.`);
-    process.exitCode = 2;
+    );
     return;
   }
   const dailyRecs = parseDailyTempsF(daily);
@@ -358,8 +529,21 @@ async function main() {
     r => Number.isFinite(r.tminF) && Number.isFinite(r.tmaxF),
   );
   console.log(
-    `Daily records: ${dailyRecs.length} total / ${validDaily.length} with valid min+max`,
+    `[phenology] Daily records: ${dailyRecs.length} total / ${validDaily.length} with valid min+max`,
   );
+
+  if (validDaily.length === 0) {
+    writeUnavailable(
+      `CIMIS daily returned ${dailyRecs.length} records but none had usable min+max for station ${CIMIS_STATION} ${DD_START} → ${DD_END}.`,
+      'no-data',
+      {
+        configHint: baseConfigHint,
+        partialChillPortions: Number(chillPortions.toFixed(2)),
+        models: pestModelsForReport(),
+      },
+    );
+    return;
+  }
 
   // Compute per-pest cumulative DD across the window. The same station record
   // is applied to every block (single-station case); per-block DD totals will
@@ -484,7 +668,7 @@ async function main() {
 
   writeFileSync(OUT_PATH, JSON.stringify(doc, null, 2));
   console.log(
-    `Wrote ${OUT_PATH}: chill portions=${doc.chill.portions} / DD-PTB=${ddByPest.peachTwigBorer.cumulativeDDF} / DD-NOW=${ddByPest.navelOrangeworm.cumulativeDDF}`,
+    `[phenology] Wrote ${OUT_PATH}: chill portions=${doc.chill.portions} / DD-PTB=${ddByPest.peachTwigBorer.cumulativeDDF} / DD-NOW=${ddByPest.navelOrangeworm.cumulativeDDF}`,
   );
 }
 
@@ -504,16 +688,27 @@ function pestModelsForReport() {
 }
 
 main().catch(err => {
-  console.error('build-phenology FAILED:', err);
   // Even on unexpected failure, write an unavailable state so the dashboard
-  // never renders fabricated values.
+  // never renders fabricated values AND the build still succeeds. Vercel /
+  // CI must never fail solely because CIMIS is unreachable or buggy.
+  console.error(
+    `[phenology] unexpected error (build will continue): ${redactKey(err?.message || String(err))}`,
+  );
+  if (err?.stack) console.error(redactKey(err.stack));
   try {
-    const doc = unavailable(`Unexpected build error: ${err.message}`, {
-      models: pestModelsForReport(),
-    });
-    writeFileSync(OUT_PATH, JSON.stringify(doc, null, 2));
-  } catch {
-    /* already failing */
+    writeUnavailable(
+      `Unexpected build error: ${err?.message || String(err)}`,
+      err?.errorKind || 'unexpected',
+      {
+        httpStatus: err?.httpStatus ?? null,
+        models: pestModelsForReport(),
+      },
+    );
+  } catch (writeErr) {
+    console.error(
+      `[phenology] failed to write unavailable state: ${redactKey(writeErr?.message || String(writeErr))}`,
+    );
   }
-  process.exit(1);
+  // Exit 0 so npm prebuild does not fail the Vercel/CI build.
+  process.exit(0);
 });

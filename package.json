@@ -16,7 +16,8 @@
     "districts:build": "node scripts/build-districts.mjs",
     "districts:validate": "node scripts/validate-districts.mjs",
     "phenology:build": "node scripts/build-phenology.mjs",
-    "phenology:validate": "node scripts/validate-phenology.mjs"
+    "phenology:validate": "node scripts/validate-phenology.mjs",
+    "phenology:test": "node scripts/test-phenology-dates.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

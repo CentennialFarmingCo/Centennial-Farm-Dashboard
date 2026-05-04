@@ -45,17 +45,22 @@ const CIMIS_APP_KEY = process.env.CIMIS_APP_KEY?.trim() || '';
 // CIMIS station list: https://cimis.water.ca.gov/Stations.aspx
 const CIMIS_STATION = (process.env.CIMIS_STATION || '148').trim();
 
-// Chill season window. Default Nov 1 (prior calendar year) through Mar 1 of
-// current calendar year, matching UC Davis chill accumulation reporting.
-const today = new Date();
-const yyyy = today.getUTCFullYear();
+// CIMIS reports California weather and rejects requests where any date is
+// strictly greater than "today" in the station's local (Pacific) timezone with
+// HTTP 400 [ERR1010-FUTURE DATE FAULT]. Vercel/Node runs in UTC, which means a
+// naive `new Date()` rolls over to tomorrow-in-LA after 4 PM PST / 5 PM PDT —
+// so any UTC-derived "today" produced a guaranteed bad-date during evening
+// builds. We compute today (and the default season anchor year) in
+// America/Los_Angeles so build-time defaults always match CIMIS's calendar.
+const TODAY_LA = todayInLosAngeles();
+const yyyy = Number(TODAY_LA.slice(0, 4));
 const CHILL_SEASON_START =
   process.env.CHILL_SEASON_START?.trim() || `${yyyy - 1}-11-01`;
 const CHILL_SEASON_END =
   process.env.CHILL_SEASON_END?.trim() ||
   `${yyyy}-03-01`;
 
-// Degree-day window. Default Jan 1 of current year through today.
+// Degree-day window. Default Jan 1 of current year through today (LA).
 // UC IPM trap-biofix dates differ year-to-year and by orchard; defaulting to
 // season-to-date is clearly labelled in the UI as such.
 const DD_START =
@@ -64,7 +69,7 @@ const DD_START =
   `${yyyy}-01-01`;
 const DD_END =
   process.env.PHENOLOGY_END_DATE?.trim() ||
-  isoDate(today);
+  TODAY_LA;
 
 // Per-pest biofix overrides (optional; otherwise DD_START is used)
 const BIOFIX_PTB =
@@ -100,6 +105,23 @@ function isoDate(d) {
   const m = String(d.getUTCMonth() + 1).padStart(2, '0');
   const dd = String(d.getUTCDate()).padStart(2, '0');
   return `${y}-${m}-${dd}`;
+}
+
+// Today's date as YYYY-MM-DD in the America/Los_Angeles timezone (CIMIS's
+// reference calendar). Uses Intl with an explicit timeZone so it works
+// regardless of Node's process timezone — Vercel functions run in UTC, where
+// `new Date()` ticks over to "tomorrow LA" any time after ~16:00 local.
+// CIMIS rejects future-dated requests with HTTP 400 [ERR1010-FUTURE DATE
+// FAULT], so we anchor every default and clamp on this value.
+function todayInLosAngeles(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Los_Angeles',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+  return `${map.year}-${map.month}-${map.day}`;
 }
 
 // ---------- Dynamic Model (chill portions) ----------
@@ -444,6 +466,30 @@ async function main() {
     return;
   }
 
+  // CIMIS rejects any request where startDate or endDate is strictly later
+  // than "today" in California local time (HTTP 400 [ERR1010-FUTURE DATE
+  // FAULT]). When the operator did not pin a date via env, our defaults are
+  // already anchored on TODAY_LA. When an operator *did* set an explicit
+  // override that is future-dated relative to TODAY_LA, refuse rather than
+  // silently shipping a request CIMIS will reject — emit an unavailable JSON
+  // with a clear, actionable diagnostic so the build still succeeds.
+  const futureDates = [];
+  if (CHILL_SEASON_END > TODAY_LA) futureDates.push(['CHILL_SEASON_END', CHILL_SEASON_END]);
+  if (CHILL_SEASON_START > TODAY_LA) futureDates.push(['CHILL_SEASON_START', CHILL_SEASON_START]);
+  if (DD_END > TODAY_LA) futureDates.push(['PHENOLOGY_END_DATE', DD_END]);
+  if (DD_START > TODAY_LA) futureDates.push(['PHENOLOGY_START_DATE/DEGREE_DAY_BIOFIX_PEACH', DD_START]);
+  if (BIOFIX_PTB > TODAY_LA) futureDates.push(['DEGREE_DAY_BIOFIX_PEACH', BIOFIX_PTB]);
+  if (BIOFIX_NOW > TODAY_LA) futureDates.push(['DEGREE_DAY_BIOFIX_ALMOND', BIOFIX_NOW]);
+  if (futureDates.length > 0) {
+    const detail = futureDates.map(([k, v]) => `${k}=${v}`).join(', ');
+    writeUnavailable(
+      `Configured date(s) are in the future relative to California local date ${TODAY_LA}: ${detail}. CIMIS rejects future-dated requests with [ERR1010-FUTURE DATE FAULT]. Adjust the env override(s) or unset them to use today-in-LA.`,
+      'bad-date',
+      { configHint: baseConfigHint, todayLocal: TODAY_LA, models: pestModelsForReport() },
+    );
+    return;
+  }
+
   console.log(`[phenology] Fetching CIMIS station ${CIMIS_STATION} metadata...`);
   let stationMeta = null;
   try {
@@ -630,6 +676,7 @@ async function main() {
   const doc = {
     metadata: {
       generatedAt: new Date().toISOString(),
+      todayLocal: TODAY_LA,
       available: true,
       source: {
         weather: 'California Irrigation Management Information System (CIMIS)',

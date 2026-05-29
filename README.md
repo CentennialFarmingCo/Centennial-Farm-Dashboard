@@ -24,6 +24,9 @@ Next.js (static export) so it can be hosted free on Vercel with no server.
   pest degree-day totals (peach twig borer for peach blocks, navel orangeworm
   for almond blocks), generated at build time from CIMIS station data. See
   the *Seasonal Models* section below.
+- **Harvest** — bins per day, today's log, and a season-to-date block
+  leaderboard, populated by the Farm-manager-bot from Telegram messages like
+  “Block 4 18 bins”. See the *Harvest tracking* section below.
 - **PDF Report** — uses the browser's Print dialog.
 
 ## Running locally
@@ -313,6 +316,54 @@ Committing the regenerated `public/phenology-summary.json` is optional —
 Vercel's `prebuild` step will overwrite it on every deploy with fresh
 CIMIS data. Commit it only if you want to ship the most recent values
 without waiting for the next deploy.
+
+## Harvest tracking
+
+The **Harvest** tab visualizes data sent from the
+[Farm-manager-bot](https://github.com/CentennialFarmingCo/Farm-manager-bot) on
+Telegram. When you message the bot something like “Block 4 18 bins”, it:
+
+1. Saves the entry to its SQLite database (durable on Render's persistent disk).
+2. Builds a fresh snapshot of *all* harvest history.
+3. Commits the snapshot to this repo as `public/harvest.json`.
+4. Vercel rebuilds and the new numbers appear on the Harvest tab in ~30s.
+
+The tab shows:
+
+- **Today's KPI** — bins logged today and a season-total strip.
+- **Bins per day chart** — last 30 days, one bar per day (zero-bin days included).
+- **Today's log** — table of every entry logged today, latest first.
+- **Block leaderboard** — season-to-date bins and bins/acre per block, sorted.
+
+Data file (committed by the bot, not by humans): `public/harvest.json`. If the
+file is missing the tab renders a friendly setup-instructions panel instead
+of an error.
+
+### Enabling the bot → dashboard sync
+
+On the Farm-manager-bot side, set `HARVEST_EXPORT_PAT` to a GitHub
+*fine-grained* PAT scoped to this repo only, with **Contents: Read and
+write**. Full setup steps live in the bot's README under “Harvest snapshot
+export (dashboard sync).” Without the PAT, harvest entries still save inside
+the bot but the dashboard won't update.
+
+### Schema (for reference)
+
+```jsonc
+{
+  "generated_at": "2026-05-29T23:42:00Z",
+  "entries": [
+    { "date": "2026-05-29", "field_id": "5", "block": "Johnston Block 4",
+      "variety": "Parade", "acres": 13, "bins": 18 }
+  ],
+  "per_day":   [ { "date": "2026-05-29", "bins": 18 } ],
+  "per_block": [ { "field_id": "5", "block": "Johnston Block 4",
+                   "variety": "Parade", "acres": 13, "bins": 18,
+                   "bins_per_acre": 1.38 } ],
+  "totals":    { "bins": 18, "entries": 1, "blocks": 1,
+                 "first_date": "2026-05-29", "last_date": "2026-05-29" }
+}
+```
 
 ## Scripts
 

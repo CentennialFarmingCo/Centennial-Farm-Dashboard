@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generatedAt": "2026-05-03T23:57:48.655Z",
+    "generatedAt": "2026-05-29T23:47:14.066Z",
     "available": false,
     "reason": "No CIMIS_APP_KEY configured at build time. Set CIMIS_APP_KEY (and optionally CIMIS_STATION) to fetch live chill portions and pest degree-day totals. See README \"Seasonal Models\" section.",
     "errorKind": "missing-key",
@@ -12,7 +12,7 @@
       },
       "degreeDayWindow": {
         "start": "2026-01-01",
-        "end": "2026-05-03"
+        "end": "2026-05-29"
       },
       "requiredEnv": [
         "CIMIS_APP_KEY"

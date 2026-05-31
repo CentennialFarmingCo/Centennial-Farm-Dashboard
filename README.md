@@ -44,11 +44,27 @@ This is a Next.js static export (`output: 'export'` in `next.config.js`). On
 Vercel, just import the repo — no special settings needed. The build produces
 a fully static site in `out/`.
 
-`npm run build` runs `phenology:build` automatically (via npm's `prebuild`
-lifecycle), so each Vercel build regenerates `public/phenology-summary.json`
-from the live CIMIS API using `CIMIS_APP_KEY` from the project's environment
-variables. If the key isn't set the script writes an *unavailable*-state
-JSON and the build still succeeds (see "Seasonal Models").
+`npm run build` runs `prebuild.mjs` automatically (via npm's `prebuild`
+lifecycle). That script decides whether to re-run the slow CIMIS phenology
+fetch:
+
+- **Locally**: always runs the fetch (so dev sees fresh numbers).
+- **On Vercel**: runs the fetch only if the commit changed phenology-relevant
+  files (`scripts/build-phenology.mjs`, `app/fields.js`, deps) OR there's no
+  cached `public/phenology-summary.json` yet. Otherwise it skips the fetch and
+  reuses the cached file from the previous deploy.
+
+Why: the Farm-manager-bot commits `public/harvest.json` after every Telegram
+harvest log, which triggers a Vercel rebuild. Without this guard, every bin
+logged would re-fetch CIMIS (5–8 minutes) for data that hasn't changed.
+
+To force a refresh on a specific deploy, set `FORCE_PHENOLOGY_REBUILD=1` in
+the Vercel project environment, redeploy, then unset it. (See also the daily
+cron suggestion in *Seasonal Models* for keeping chill/DD numbers fresh
+without pushing code.)
+
+If `CIMIS_APP_KEY` isn't set, the fetch (when it does run) writes an
+*unavailable*-state JSON and the build still succeeds (see "Seasonal Models").
 
 ## Configuring your farm location (weather)
 

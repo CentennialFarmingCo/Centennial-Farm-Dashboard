@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-05-31T00:12:01Z",
+  "entries": [
+    {
+      "date": "2026-05-31",
+      "field_id": "1",
+      "block": "Johnston Block 1",
+      "variety": "Kaweah Freestone Peach",
+      "acres": 33,
+      "bins": 5
+    }
+  ],
+  "per_day": [
+    {
+      "date": "2026-05-31",
+      "bins": 5
+    }
+  ],
+  "per_block": [
+    {
+      "field_id": "1",
+      "block": "Johnston Block 1",
+      "variety": "Kaweah Freestone Peach",
+      "acres": 33.0,
+      "bins": 5,
+      "bins_per_acre": 0.15
+    }
+  ],
+  "totals": {
+    "bins": 5,
+    "entries": 1,
+    "blocks": 1,
+    "first_date": "2026-05-31",
+    "last_date": "2026-05-31"
+  }
+}
